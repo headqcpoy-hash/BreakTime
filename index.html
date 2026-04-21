@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ระบบพักเบรค</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        button { font-size: 20px; padding: 10px 20px; cursor: pointer; }
+        #status { font-size: 24px; margin-top: 20px; color: blue; }
+    </style>
+</head>
+<body>
+    <h1>ระบบลงเวลาพักเบรค</h1>
+    <button onclick="takeBreak()">พักเบรค</button>
+    <button onclick="backToWork()">กลับมาทำงาน</button>
+    <div id="status">สถานะ: ทำงาน</div>
+
+    <script>
+        function takeBreak() {
+            document.getElementById('status').innerText = 'สถานะ: พักเบรค ☕';
+        }
+        function backToWork() {
+            document.getElementById('status').innerText = 'สถานะ: ทำงาน 💻';
+        }
+    </script>
+</body>
+</html>
