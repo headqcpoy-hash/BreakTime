@@ -13,34 +13,14 @@
     <h1>ระบบลงเวลาพักเบรค</h1>
     <select id="nameSelect">
     <option value="">เลือกชื่อพนักงาน</option>
-    <option value="A">สปอย</option>
+    <option value="สปอย">สปอย</option>
     <option value="B">B</option>
     <option value="C">C</option>
     <option value="D">D</option>
 </select>
 <br><br>
-    function takeBreak() {
-    const name = getName();
-
-    if (!name) {
-        alert("กรุณาเลือกชื่อพนักงาน");
-        return;
-    }
-
-    document.getElementById('status').innerText =
-        'สถานะ: ' + name + ' พักเบรค ☕';
-}
-    function backToWork() {
-    const name = getName();
-
-    if (!name) {
-        alert("กรุณาเลือกชื่อพนักงาน");
-        return;
-    }
-
-    document.getElementById('status').innerText =
-        'สถานะ: ' + name + ' ทำงาน 💻';
-}
+    <button onclick="takeBreak()">พักเบรค</button>
+    <button onclick="takeBreak()">กลับมา</button>
 
     <script>
         function takeBreak() {
