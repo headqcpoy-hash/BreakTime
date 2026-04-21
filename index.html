@@ -19,9 +19,28 @@
     <option value="D">D</option>
 </select>
 <br><br>
-    <button onclick="takeBreak()">พักเบรค</button>
-    <button onclick="backToWork()">กลับมาทำงาน</button>
-    <div id="status">สถานะ: ทำงาน</div>
+    function takeBreak() {
+    const name = getName();
+
+    if (!name) {
+        alert("กรุณาเลือกชื่อพนักงาน");
+        return;
+    }
+
+    document.getElementById('status').innerText =
+        'สถานะ: ' + name + ' พักเบรค ☕';
+}
+    function backToWork() {
+    const name = getName();
+
+    if (!name) {
+        alert("กรุณาเลือกชื่อพนักงาน");
+        return;
+    }
+
+    document.getElementById('status').innerText =
+        'สถานะ: ' + name + ' ทำงาน 💻';
+}
 
     <script>
         function takeBreak() {
