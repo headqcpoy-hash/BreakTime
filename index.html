@@ -32,7 +32,7 @@ body {
     transition: 0.3s;
 }
 
-/* 🕒 TOP BAR */
+/* 🕒 TOP */
 #topBar {
     position: relative;
     display: flex;
@@ -41,7 +41,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* CLOCK */
 #clockBox {
     font-size: 44px;
     font-weight: bold;
@@ -50,46 +49,36 @@ body {
     border-radius: 12px;
 }
 
-/* 🌗 TOGGLE BUTTON */
+/* 🌗 BTN */
 #themeBtn {
     position: absolute;
     right: 10px;
     top: 10px;
-
     width: 28px;
     height: 28px;
-
     font-size: 14px;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     border-radius: 6px;
     border: 1px solid var(--border);
     cursor: pointer;
 }
 
-/* LIGHT */
 body:not(.dark) #themeBtn {
     background: #fff;
     color: #000;
 }
 
-/* DARK */
 body.dark #themeBtn {
     background: #000;
     color: #fff;
 }
 
-/* LAYOUT */
+/* layout */
 .main {
     display: flex;
     gap: 15px;
 }
 
-/* LEFT */
+/* left */
 .left-panel {
     width: 230px;
     border: 2px solid var(--border);
@@ -98,12 +87,11 @@ body.dark #themeBtn {
     background: var(--box);
 }
 
-/* RIGHT */
+/* right */
 .right-panel {
     flex: 1;
 }
 
-/* BOX */
 .wrapper {
     display: flex;
     gap: 15px;
@@ -119,16 +107,40 @@ body.dark #themeBtn {
     background: var(--box);
 }
 
-/* CARD */
-.card {
+/* CARD ROW */
+.card.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+
     background: var(--card);
     margin: 6px;
     padding: 8px;
     border-radius: 8px;
-    font-size: 14px;
 }
 
-/* INPUT */
+/* columns */
+.col {
+    flex: 1;
+    font-size: 13px;
+}
+
+.col.pos {
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+.col.name {
+    font-weight: bold;
+}
+
+.col.time {
+    text-align: right;
+    font-family: monospace;
+}
+
+/* input */
 select, button {
     width: 100%;
     font-size: 14px;
@@ -147,7 +159,6 @@ select, button {
 
 <body>
 
-<!-- 🕒 TOP -->
 <div id="topBar">
     <div id="clockBox">🕒 00:00:00</div>
     <button id="themeBtn" onclick="toggleTheme()">🌙</button>
@@ -155,7 +166,6 @@ select, button {
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left-panel">
 
     <h4>☕ Control</h4>
@@ -184,22 +194,21 @@ select, button {
 
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
 
-    <div class="wrapper">
+<div class="wrapper">
 
-        <div class="box">
-            <h3>⏳ กำลังพัก (Real-time)</h3>
-            <div id="breakBox"></div>
-        </div>
-
-        <div class="box">
-            <h3>🧮 เวลาสะสม</h3>
-            <div id="totalBox"></div>
-        </div>
-
+    <div class="box">
+        <h3>⏳ กำลังพัก</h3>
+        <div id="breakBox"></div>
     </div>
+
+    <div class="box">
+        <h3>🧮 เวลาสะสม</h3>
+        <div id="totalBox"></div>
+    </div>
+
+</div>
 
 </div>
 
@@ -223,19 +232,7 @@ const data = {
 let status = {};
 let totalBreak = {};
 
-/* 🌗 THEME */
-function loadTheme() {
-    const t = localStorage.getItem("theme");
-
-    if (t === "dark") {
-        document.body.classList.add("dark");
-        document.getElementById("themeBtn").innerText = "☀️";
-    } else {
-        document.getElementById("themeBtn").innerText = "🌙";
-    }
-}
-loadTheme();
-
+/* THEME */
 function toggleTheme() {
     document.body.classList.toggle("dark");
 
@@ -250,24 +247,24 @@ function toggleTheme() {
     }
 }
 
-/* 🕒 CLOCK */
+(function loadTheme(){
+    if (localStorage.getItem("theme")==="dark"){
+        document.body.classList.add("dark");
+        document.getElementById("themeBtn").innerText="☀️";
+    }
+})();
+
+/* CLOCK */
 function updateClock() {
     const now = new Date();
-
     const h = String(now.getHours()).padStart(2,'0');
     const m = String(now.getMinutes()).padStart(2,'0');
     const s = String(now.getSeconds()).padStart(2,'0');
 
-    const d = String(now.getDate()).padStart(2,'0');
-    const mo = String(now.getMonth()+1).padStart(2,'0');
-    const y = now.getFullYear();
-
-    const days = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัส","ศุกร์","เสาร์"];
-
     document.getElementById("clockBox").innerText =
-        `🕒 ${h}:${m}:${s} | 📅 ${d}/${mo}/${y} (${days[now.getDay()]})`;
+        `🕒 ${h}:${m}:${s}`;
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
 /* NAME */
@@ -279,82 +276,86 @@ function updateNames() {
 
     if (!data[pos]) return;
 
-    data[pos].forEach(name => {
-        let opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
+    data[pos].forEach(name=>{
+        let opt=document.createElement("option");
+        opt.value=name;
+        opt.textContent=name;
         select.appendChild(opt);
     });
 }
 
 /* BREAK */
 function startBreak() {
-    const name = document.getElementById("nameSelect").value;
-    if (!name) return alert("เลือกชื่อ");
+    const name=document.getElementById("nameSelect").value;
+    if(!name) return alert("เลือกชื่อ");
 
-    status[name] = Date.now();
-    document.getElementById("status").innerText = name + " เริ่มพัก";
+    status[name]=Date.now();
+    document.getElementById("status").innerText=name+" เริ่มพัก";
 }
 
 function endBreak() {
-    const name = document.getElementById("nameSelect").value;
-    if (!name) return alert("เลือกชื่อ");
+    const name=document.getElementById("nameSelect").value;
+    if(!name) return alert("เลือกชื่อ");
 
-    if (status[name]) {
-        const min = Math.floor((Date.now() - status[name]) / 60000);
-        totalBreak[name] = (totalBreak[name] || 0) + min;
+    if(status[name]){
+        const sec=Math.floor((Date.now()-status[name])/1000);
+        totalBreak[name]=(totalBreak[name]||0)+sec;
         delete status[name];
     }
 
-    document.getElementById("status").innerText = name + " กลับแล้ว";
+    document.getElementById("status").innerText=name+" กลับแล้ว";
     renderTotal();
 }
 
-/* ⏱ FORMAT MM:SS */
-function formatTime(ms) {
-    const sec = Math.floor(ms / 1000);
-    const m = String(Math.floor(sec / 60)).padStart(2,'0');
-    const s = String(sec % 60).padStart(2,'0');
-    return `${m}:${s}`;
+/* FORMAT */
+function format(ms){
+    const s=Math.floor(ms/1000);
+    const m=String(Math.floor(s/60)).padStart(2,'0');
+    const r=String(s%60).padStart(2,'0');
+    return `${m}:${r}`;
+}
+
+function findPos(name){
+    for(const p in data){
+        if(data[p].includes(name)) return p;
+    }
+    return "-";
 }
 
 /* LIVE BREAK */
-function render() {
-    const box = document.getElementById("breakBox");
-    box.innerHTML = "";
+function render(){
+    const box=document.getElementById("breakBox");
+    box.innerHTML="";
 
-    Object.keys(status).forEach(name => {
-        const elapsed = Date.now() - status[name];
-
-        box.innerHTML += `
-            <div class="card">
-                <b>${name}</b><br>
-                ⏳ ${formatTime(elapsed)}
-            </div>
-        `;
+    Object.keys(status).forEach(name=>{
+        box.innerHTML+=`
+        <div class="card row">
+            <div class="col pos">${findPos(name)}</div>
+            <div class="col name">${name}</div>
+            <div class="col time">⏳ ${format(Date.now()-status[name])}</div>
+        </div>`;
     });
 }
 
 /* TOTAL */
-function renderTotal() {
-    const box = document.getElementById("totalBox");
-    box.innerHTML = "";
+function renderTotal(){
+    const box=document.getElementById("totalBox");
+    box.innerHTML="";
 
-    Object.keys(totalBreak).forEach(name => {
-        box.innerHTML += `
-            <div class="card">
-                <b>${name}</b><br>
-                🧮 ${totalBreak[name]} นาที
-            </div>
-        `;
+    Object.keys(totalBreak).forEach(name=>{
+        box.innerHTML+=`
+        <div class="card row">
+            <div class="col pos">${findPos(name)}</div>
+            <div class="col name">${name}</div>
+            <div class="col time">🧮 ${format(totalBreak[name]*1000)}</div>
+        </div>`;
     });
 }
 
-/* REALTIME */
-setInterval(() => {
+setInterval(()=>{
     render();
     renderTotal();
-}, 1000);
+},1000);
 
 </script>
 
