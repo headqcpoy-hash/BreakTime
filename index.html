@@ -15,7 +15,6 @@
     --card: #ffe6a7;
 }
 
-/* 🌙 DARK MODE */
 body.dark {
     --bg: #121212;
     --text: #ffffff;
@@ -51,40 +50,48 @@ body {
     border-radius: 12px;
 }
 
-/* 🌗 BUTTON (small top-right) */
+/* 🌗 ULTRA SMALL TOGGLE BUTTON */
 #themeBtn {
     position: absolute;
     right: 10px;
     top: 10px;
 
-    font-size: 11px;
-    padding: 3px 6px;
+    width: 28px;
+    height: 28px;
+
+    font-size: 14px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border-radius: 6px;
+    border: 1px solid var(--border);
     cursor: pointer;
 
-    border: 1px solid var(--border);
     transition: 0.2s;
 }
 
-/* ☀️ LIGHT */
+/* LIGHT MODE BUTTON */
 body:not(.dark) #themeBtn {
     background: #ffffff;
     color: #000;
 }
 
-/* 🌙 DARK */
+/* DARK MODE BUTTON */
 body.dark #themeBtn {
     background: #000000;
     color: #ffffff;
 }
 
-/* layout */
+/* MAIN LAYOUT */
 .main {
     display: flex;
     gap: 15px;
 }
 
-/* LEFT */
+/* LEFT PANEL */
 .left-panel {
     width: 230px;
     border: 2px solid var(--border);
@@ -93,7 +100,7 @@ body.dark #themeBtn {
     background: var(--box);
 }
 
-/* RIGHT */
+/* RIGHT PANEL */
 .right-panel {
     flex: 1;
 }
@@ -142,7 +149,7 @@ select, button {
 
 <body>
 
-<!-- 🕒 TOP -->
+<!-- 🕒 TOP BAR -->
 <div id="topBar">
     <div id="clockBox">🕒 00:00:00</div>
     <button id="themeBtn" onclick="toggleTheme()">🌙</button>
@@ -220,9 +227,13 @@ let totalBreak = {};
 
 /* 🌗 LOAD THEME */
 function loadTheme() {
-    if (localStorage.getItem("theme") === "dark") {
+    const theme = localStorage.getItem("theme");
+
+    if (theme === "dark") {
         document.body.classList.add("dark");
         document.getElementById("themeBtn").innerText = "☀️";
+    } else {
+        document.getElementById("themeBtn").innerText = "🌙";
     }
 }
 loadTheme();
@@ -280,7 +291,7 @@ function updateNames() {
     });
 }
 
-/* BREAK START */
+/* BREAK */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -290,7 +301,6 @@ function startBreak() {
     render();
 }
 
-/* BREAK END */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
