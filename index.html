@@ -11,13 +11,25 @@ body {
     padding: 15px;
 }
 
-/* 🔥 layout หลัก */
+/* 🕒 CLOCK */
+#clockBox {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px auto 15px auto;
+    padding: 8px 15px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+/* layout */
 .main {
     display: flex;
     gap: 15px;
 }
 
-/* 🔥 ซ้าย (control panel) */
+/* left control */
 .left-panel {
     width: 220px;
     border: 2px solid #ccc;
@@ -26,12 +38,12 @@ body {
     height: fit-content;
 }
 
-/* 🔥 ขวา (dashboard) */
+/* right dashboard */
 .right-panel {
     flex: 1;
 }
 
-/* 🔥 2 กล่อง dashboard */
+/* 2 boxes */
 .wrapper {
     display: flex;
     gap: 15px;
@@ -46,7 +58,7 @@ body {
     padding: 10px;
 }
 
-/* card */
+/* cards */
 .card {
     background: #ffe6a7;
     margin: 6px;
@@ -66,7 +78,7 @@ body {
     margin-top: 10px;
 }
 
-/* input */
+/* inputs */
 select, button {
     width: 100%;
     font-size: 14px;
@@ -78,9 +90,12 @@ select, button {
 
 <body>
 
+<!-- 🕒 CLOCK -->
+<div id="clockBox">🕒 00:00:00</div>
+
 <div class="main">
 
-    <!-- 🔥 LEFT CONTROL -->
+    <!-- LEFT -->
     <div class="left-panel">
 
         <h4>☕ Control</h4>
@@ -109,7 +124,7 @@ select, button {
 
     </div>
 
-    <!-- 🔥 RIGHT DASHBOARD -->
+    <!-- RIGHT -->
     <div class="right-panel">
 
         <div class="wrapper">
@@ -148,7 +163,20 @@ const data = {
 let status = {};
 let totalBreak = {};
 
-/* update names */
+/* CLOCK */
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+
+    document.getElementById("clockBox").innerText =
+        `🕒 ${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* NAME */
 function updateNames() {
     const pos = document.getElementById("positionSelect").value;
     const select = document.getElementById("nameSelect");
@@ -165,7 +193,7 @@ function updateNames() {
     });
 }
 
-/* start */
+/* START */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -175,7 +203,7 @@ function startBreak() {
     render();
 }
 
-/* end */
+/* END */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -191,7 +219,7 @@ function endBreak() {
     renderTotal();
 }
 
-/* live */
+/* LIVE */
 function getMin(t) {
     return Math.floor((Date.now() - t) / 60000);
 }
