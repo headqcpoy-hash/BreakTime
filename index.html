@@ -5,32 +5,45 @@
 <title>Break Dashboard</title>
 
 <style>
-body { font-family: sans-serif; padding: 20px; text-align:center; }
-
-/* 🔥 control */
-select, button {
-    font-size: 16px;
-    padding: 5px;
-    margin: 5px;
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 15px;
 }
 
-/* 🔥 layout 2 ฝั่ง */
-.wrapper {
+/* 🔥 layout หลัก */
+.main {
     display: flex;
-    justify-content: center;
     gap: 15px;
-    margin-top: 20px;
-    flex-wrap: wrap;
 }
 
-/* 🔥 กล่องเล็กลง */
-.box {
-    width: 45%;
-    min-width: 320px;
+/* 🔥 ซ้าย (control panel) */
+.left-panel {
+    width: 220px;
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 10px;
-    background: #fff;
+    height: fit-content;
+}
+
+/* 🔥 ขวา (dashboard) */
+.right-panel {
+    flex: 1;
+}
+
+/* 🔥 2 กล่อง dashboard */
+.wrapper {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.box {
+    flex: 1;
+    min-width: 300px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 /* card */
@@ -48,52 +61,71 @@ select, button {
 }
 
 #status {
-    font-size: 18px;
+    font-size: 14px;
     color: blue;
     margin-top: 10px;
+}
+
+/* input */
+select, button {
+    width: 100%;
+    font-size: 14px;
+    padding: 5px;
+    margin-top: 5px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>☕ Break Dashboard</h2>
+<div class="main">
 
-<select id="positionSelect" onchange="updateNames()">
-    <option value="">เลือกตำแหน่ง</option>
-    <option value="Head">Head</option>
-    <option value="QC-SA">QC-SA</option>
-    <option value="QC-SV">QC-SV</option>
-    <option value="QC-PR">QC-PR</option>
-    <option value="QC-AI">QC-AI</option>
-    <option value="QC-MKT">QC-MKT</option>
-    <option value="QC-Support">QC-Support</option>
-    <option value="AD-BO">AD-BO</option>
-    <option value="AD-STM">AD-STM</option>
-</select>
+    <!-- 🔥 LEFT CONTROL -->
+    <div class="left-panel">
 
-<select id="nameSelect">
-    <option value="">เลือกชื่อ</option>
-</select>
+        <h4>☕ Control</h4>
 
-<br>
+        <select id="positionSelect" onchange="updateNames()">
+            <option value="">ตำแหน่ง</option>
+            <option value="Head">Head</option>
+            <option value="QC-SA">QC-SA</option>
+            <option value="QC-SV">QC-SV</option>
+            <option value="QC-PR">QC-PR</option>
+            <option value="QC-AI">QC-AI</option>
+            <option value="QC-MKT">QC-MKT</option>
+            <option value="QC-Support">QC-Support</option>
+            <option value="AD-BO">AD-BO</option>
+            <option value="AD-STM">AD-STM</option>
+        </select>
 
-<button onclick="startBreak()">พัก</button>
-<button onclick="endBreak()">กลับ</button>
+        <select id="nameSelect">
+            <option value="">ชื่อ</option>
+        </select>
 
-<div id="status">สถานะ: -</div>
+        <button onclick="startBreak()">พัก ☕</button>
+        <button onclick="endBreak()">กลับ 💻</button>
 
-<!-- 🔥 2 กล่องซ้าย-ขวา -->
-<div class="wrapper">
+        <div id="status">สถานะ: -</div>
 
-    <div class="box">
-        <h3>⏳ กำลังพัก</h3>
-        <div id="breakBox"></div>
     </div>
 
-    <div class="box">
-        <h3>🧮 เวลาสะสม</h3>
-        <div id="totalBox"></div>
+    <!-- 🔥 RIGHT DASHBOARD -->
+    <div class="right-panel">
+
+        <div class="wrapper">
+
+            <div class="box">
+                <h3>⏳ กำลังพัก</h3>
+                <div id="breakBox"></div>
+            </div>
+
+            <div class="box">
+                <h3>🧮 เวลาสะสม</h3>
+                <div id="totalBox"></div>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -116,12 +148,12 @@ const data = {
 let status = {};
 let totalBreak = {};
 
-/* update name */
+/* update names */
 function updateNames() {
     const pos = document.getElementById("positionSelect").value;
     const select = document.getElementById("nameSelect");
 
-    select.innerHTML = '<option value="">เลือกชื่อ</option>';
+    select.innerHTML = '<option value="">ชื่อ</option>';
 
     if (!data[pos]) return;
 
@@ -139,7 +171,7 @@ function startBreak() {
     if (!name) return alert("เลือกชื่อ");
 
     status[name] = Date.now();
-    document.getElementById("status").innerText = name + " เริ่มพัก ☕";
+    document.getElementById("status").innerText = name + " เริ่มพัก";
     render();
 }
 
@@ -154,12 +186,12 @@ function endBreak() {
         delete status[name];
     }
 
-    document.getElementById("status").innerText = name + " กลับแล้ว 💻";
+    document.getElementById("status").innerText = name + " กลับแล้ว";
     render();
     renderTotal();
 }
 
-/* live break */
+/* live */
 function getMin(t) {
     return Math.floor((Date.now() - t) / 60000);
 }
@@ -172,14 +204,12 @@ function render() {
         box.innerHTML += `
             <div class="card">
                 <b>${name}</b><br>
-                ⏳ พักอยู่<br>
-                <span class="time">${getMin(status[name])} นาที</span>
+                ⏳ ${getMin(status[name])} นาที
             </div>
         `;
     });
 }
 
-/* total */
 function renderTotal() {
     const box = document.getElementById("totalBox");
     box.innerHTML = "";
@@ -188,14 +218,12 @@ function renderTotal() {
         box.innerHTML += `
             <div class="card">
                 <b>${name}</b><br>
-                🧮 รวมพัก<br>
-                <span class="time">${totalBreak[name]} นาที</span>
+                🧮 ${totalBreak[name]} นาที
             </div>
         `;
     });
 }
 
-/* auto */
 setInterval(() => {
     render();
     renderTotal();
