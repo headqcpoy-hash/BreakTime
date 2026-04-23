@@ -7,34 +7,48 @@
 <style>
 body { font-family: sans-serif; padding: 20px; text-align:center; }
 
+/* 🔥 control */
 select, button {
-    font-size: 18px;
-    padding: 6px;
+    font-size: 16px;
+    padding: 5px;
     margin: 5px;
 }
 
+/* 🔥 layout 2 ฝั่ง */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+/* 🔥 กล่องเล็กลง */
 .box {
-    width: 60%;
+    width: 45%;
+    min-width: 320px;
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 10px;
-    margin: 15px auto;
+    background: #fff;
 }
 
+/* card */
 .card {
     background: #ffe6a7;
-    margin: 8px;
-    padding: 10px;
+    margin: 6px;
+    padding: 8px;
     border-radius: 8px;
+    font-size: 14px;
 }
 
 .time {
-    font-size: 14px;
+    font-size: 13px;
     color: #555;
 }
 
 #status {
-    font-size: 20px;
+    font-size: 18px;
     color: blue;
     margin-top: 10px;
 }
@@ -43,7 +57,7 @@ select, button {
 
 <body>
 
-<h1>☕ Break Dashboard (รวมเวลาพัก)</h1>
+<h2>☕ Break Dashboard</h2>
 
 <select id="positionSelect" onchange="updateNames()">
     <option value="">เลือกตำแหน่ง</option>
@@ -64,21 +78,24 @@ select, button {
 
 <br>
 
-<button onclick="startBreak()">พักเบรค</button>
-<button onclick="endBreak()">กลับมา</button>
+<button onclick="startBreak()">พัก</button>
+<button onclick="endBreak()">กลับ</button>
 
 <div id="status">สถานะ: -</div>
 
-<!-- 🔥 คนกำลังพัก -->
-<div class="box">
-    <h2>⏳ คนที่กำลังพัก (Real-time)</h2>
-    <div id="breakBox"></div>
-</div>
+<!-- 🔥 2 กล่องซ้าย-ขวา -->
+<div class="wrapper">
 
-<!-- 🔥 เวลาสะสม -->
-<div class="box">
-    <h2>🧮 เวลาพักสะสม</h2>
-    <div id="totalBox"></div>
+    <div class="box">
+        <h3>⏳ กำลังพัก</h3>
+        <div id="breakBox"></div>
+    </div>
+
+    <div class="box">
+        <h3>🧮 เวลาสะสม</h3>
+        <div id="totalBox"></div>
+    </div>
+
 </div>
 
 <script>
@@ -96,11 +113,10 @@ const data = {
 "AD-STM": ["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
-/* state */
 let status = {};
 let totalBreak = {};
 
-/* update names */
+/* update name */
 function updateNames() {
     const pos = document.getElementById("positionSelect").value;
     const select = document.getElementById("nameSelect");
@@ -117,43 +133,35 @@ function updateNames() {
     });
 }
 
-/* start break */
+/* start */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
 
     status[name] = Date.now();
-
-    document.getElementById("status").innerText =
-        name + " เริ่มพัก ☕";
-
+    document.getElementById("status").innerText = name + " เริ่มพัก ☕";
     render();
 }
 
-/* end break */
+/* end */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
 
     if (status[name]) {
-        const diff = Date.now() - status[name];
-        const minutes = Math.floor(diff / 60000);
-
-        totalBreak[name] = (totalBreak[name] || 0) + minutes;
-
+        const min = Math.floor((Date.now() - status[name]) / 60000);
+        totalBreak[name] = (totalBreak[name] || 0) + min;
         delete status[name];
     }
 
-    document.getElementById("status").innerText =
-        name + " กลับมาทำงาน 💻";
-
+    document.getElementById("status").innerText = name + " กลับแล้ว 💻";
     render();
     renderTotal();
 }
 
-/* realtime break */
-function getMin(start) {
-    return Math.floor((Date.now() - start) / 60000);
+/* live break */
+function getMin(t) {
+    return Math.floor((Date.now() - t) / 60000);
 }
 
 function render() {
@@ -161,19 +169,17 @@ function render() {
     box.innerHTML = "";
 
     Object.keys(status).forEach(name => {
-        const min = getMin(status[name]);
-
         box.innerHTML += `
             <div class="card">
                 <b>${name}</b><br>
-                ⏳ กำลังพัก<br>
-                <span class="time">${min} นาที</span>
+                ⏳ พักอยู่<br>
+                <span class="time">${getMin(status[name])} นาที</span>
             </div>
         `;
     });
 }
 
-/* total break */
+/* total */
 function renderTotal() {
     const box = document.getElementById("totalBox");
     box.innerHTML = "";
@@ -182,14 +188,14 @@ function renderTotal() {
         box.innerHTML += `
             <div class="card">
                 <b>${name}</b><br>
-                🧮 รวมเวลาพัก<br>
+                🧮 รวมพัก<br>
                 <span class="time">${totalBreak[name]} นาที</span>
             </div>
         `;
     });
 }
 
-/* auto refresh */
+/* auto */
 setInterval(() => {
     render();
     renderTotal();
