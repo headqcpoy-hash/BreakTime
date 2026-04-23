@@ -5,22 +5,56 @@
 <title>Break Dashboard</title>
 
 <style>
+
+/* 🌈 THEME VARIABLES */
+:root {
+    --bg: #ffffff;
+    --text: #000;
+    --box: #ffffff;
+    --border: #ccc;
+    --card: #ffe6a7;
+}
+
+/* 🌙 DARK MODE */
+body.dark {
+    --bg: #121212;
+    --text: #ffffff;
+    --box: #1e1e1e;
+    --border: #444;
+    --card: #333;
+}
+
 body {
     font-family: sans-serif;
     margin: 0;
     padding: 15px;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
 }
 
 /* 🕒 CLOCK */
+#topBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
 #clockBox {
-    font-size: 22px;
+    font-size: 38px;
     font-weight: bold;
-    text-align: center;
-    margin: 10px auto 15px auto;
-    padding: 8px 15px;
-    border: 2px solid #333;
-    border-radius: 10px;
-    width: fit-content;
+    padding: 10px 20px;
+    border: 3px solid var(--border);
+    border-radius: 12px;
+}
+
+/* 🌗 BUTTON */
+#themeBtn {
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 /* layout */
@@ -29,21 +63,21 @@ body {
     gap: 15px;
 }
 
-/* left control */
+/* left */
 .left-panel {
-    width: 220px;
-    border: 2px solid #ccc;
+    width: 230px;
+    border: 2px solid var(--border);
     border-radius: 10px;
     padding: 10px;
-    height: fit-content;
+    background: var(--box);
 }
 
-/* right dashboard */
+/* right */
 .right-panel {
     flex: 1;
 }
 
-/* 2 boxes */
+/* boxes */
 .wrapper {
     display: flex;
     gap: 15px;
@@ -52,29 +86,25 @@ body {
 
 .box {
     flex: 1;
-    min-width: 300px;
-    border: 2px solid #ccc;
+    min-width: 320px;
+    border: 2px solid var(--border);
     border-radius: 10px;
     padding: 10px;
+    background: var(--box);
 }
 
 /* cards */
 .card {
-    background: #ffe6a7;
+    background: var(--card);
     margin: 6px;
     padding: 8px;
     border-radius: 8px;
     font-size: 14px;
 }
 
-.time {
-    font-size: 13px;
-    color: #555;
-}
-
 #status {
     font-size: 14px;
-    color: blue;
+    color: #4a90e2;
     margin-top: 10px;
 }
 
@@ -90,8 +120,11 @@ select, button {
 
 <body>
 
-<!-- 🕒 CLOCK -->
-<div id="clockBox">🕒 00:00:00</div>
+<!-- 🕒 TOP BAR -->
+<div id="topBar">
+    <div id="clockBox">🕒 00:00:00</div>
+    <button id="themeBtn" onclick="toggleTheme()">🌙 โหมดกลางคืน</button>
+</div>
 
 <div class="main">
 
@@ -163,16 +196,37 @@ const data = {
 let status = {};
 let totalBreak = {};
 
-/* CLOCK */
+/* 🌗 THEME TOGGLE */
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const btn = document.getElementById("themeBtn");
+
+    if (document.body.classList.contains("dark")) {
+        btn.innerText = "☀️ โหมดกลางวัน";
+    } else {
+        btn.innerText = "🌙 โหมดกลางคืน";
+    }
+}
+
+/* 🕒 CLOCK */
 function updateClock() {
     const now = new Date();
+
     const h = String(now.getHours()).padStart(2,'0');
     const m = String(now.getMinutes()).padStart(2,'0');
     const s = String(now.getSeconds()).padStart(2,'0');
 
+    const d = String(now.getDate()).padStart(2,'0');
+    const mo = String(now.getMonth()+1).padStart(2,'0');
+    const y = now.getFullYear();
+
+    const days = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัส","ศุกร์","เสาร์"];
+
     document.getElementById("clockBox").innerText =
-        `🕒 ${h}:${m}:${s}`;
+        `🕒 ${h}:${m}:${s} | 📅 ${d}/${mo}/${y} (${days[now.getDay()]})`;
 }
+
 setInterval(updateClock, 1000);
 updateClock();
 
@@ -193,7 +247,7 @@ function updateNames() {
     });
 }
 
-/* START */
+/* BREAK START */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -203,7 +257,7 @@ function startBreak() {
     render();
 }
 
-/* END */
+/* BREAK END */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
