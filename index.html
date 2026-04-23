@@ -13,19 +13,12 @@ select, button {
     margin: 5px;
 }
 
-.container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-}
-
 .box {
     width: 60%;
     border: 2px solid #ccc;
     border-radius: 10px;
     padding: 10px;
-    margin: auto;
+    margin: 15px auto;
 }
 
 .card {
@@ -50,9 +43,8 @@ select, button {
 
 <body>
 
-<h1>☕ Break Dashboard (แยกตำแหน่ง)</h1>
+<h1>☕ Break Dashboard (รวมเวลาพัก)</h1>
 
-<!-- 🔥 ตำแหน่ง -->
 <select id="positionSelect" onchange="updateNames()">
     <option value="">เลือกตำแหน่ง</option>
     <option value="Head">Head</option>
@@ -66,7 +58,6 @@ select, button {
     <option value="AD-STM">AD-STM</option>
 </select>
 
-<!-- 🔥 ชื่อ -->
 <select id="nameSelect">
     <option value="">เลือกชื่อ</option>
 </select>
@@ -78,41 +69,38 @@ select, button {
 
 <div id="status">สถานะ: -</div>
 
-<hr>
-
+<!-- 🔥 คนกำลังพัก -->
 <div class="box">
     <h2>⏳ คนที่กำลังพัก (Real-time)</h2>
     <div id="breakBox"></div>
 </div>
 
+<!-- 🔥 เวลาสะสม -->
+<div class="box">
+    <h2>🧮 เวลาพักสะสม</h2>
+    <div id="totalBox"></div>
+</div>
+
 <script>
 
-/* 🔥 DATA แยกตามตำแหน่ง */
+/* DATA */
 const data = {
-
 "Head": ["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
-
 "QC-SA": ["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-
 "QC-SV": ["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
-
 "QC-PR": ["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
-
 "QC-AI": ["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-
 "QC-MKT": ["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
-
 "QC-Support": ["เบล","อุ้ม"],
-
 "AD-BO": ["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่ 789","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง 786","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่ 168","นิ"],
-
 "AD-STM": ["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
-/* 🔥 status + เวลา */
-let status = {}; // name -> start time
+/* state */
+let status = {};
+let totalBreak = {};
 
-/* 🔥 เปลี่ยนชื่อ */
+/* update names */
 function updateNames() {
     const pos = document.getElementById("positionSelect").value;
     const select = document.getElementById("nameSelect");
@@ -129,7 +117,7 @@ function updateNames() {
     });
 }
 
-/* 🔥 เริ่มพัก */
+/* start break */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -142,25 +130,32 @@ function startBreak() {
     render();
 }
 
-/* 🔥 จบพัก */
+/* end break */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
 
-    delete status[name];
+    if (status[name]) {
+        const diff = Date.now() - status[name];
+        const minutes = Math.floor(diff / 60000);
+
+        totalBreak[name] = (totalBreak[name] || 0) + minutes;
+
+        delete status[name];
+    }
 
     document.getElementById("status").innerText =
         name + " กลับมาทำงาน 💻";
 
     render();
+    renderTotal();
 }
 
-/* 🔥 คำนวณเวลา */
+/* realtime break */
 function getMin(start) {
     return Math.floor((Date.now() - start) / 60000);
 }
 
-/* 🔥 render เฉพาะคนที่พัก */
 function render() {
     const box = document.getElementById("breakBox");
     box.innerHTML = "";
@@ -171,15 +166,34 @@ function render() {
         box.innerHTML += `
             <div class="card">
                 <b>${name}</b><br>
-                ⏳ กำลังพักอยู่<br>
+                ⏳ กำลังพัก<br>
                 <span class="time">${min} นาที</span>
             </div>
         `;
     });
 }
 
-/* 🔥 auto refresh */
-setInterval(render, 3000);
+/* total break */
+function renderTotal() {
+    const box = document.getElementById("totalBox");
+    box.innerHTML = "";
+
+    Object.keys(totalBreak).forEach(name => {
+        box.innerHTML += `
+            <div class="card">
+                <b>${name}</b><br>
+                🧮 รวมเวลาพัก<br>
+                <span class="time">${totalBreak[name]} นาที</span>
+            </div>
+        `;
+    });
+}
+
+/* auto refresh */
+setInterval(() => {
+    render();
+    renderTotal();
+}, 3000);
 
 </script>
 
