@@ -6,7 +6,7 @@
 
 <style>
 
-/* 🌈 THEME VARIABLES */
+/* 🌈 THEME */
 :root {
     --bg: #ffffff;
     --text: #000;
@@ -15,7 +15,6 @@
     --card: #ffe6a7;
 }
 
-/* 🌙 DARK MODE */
 body.dark {
     --bg: #121212;
     --text: #ffffff;
@@ -33,37 +32,51 @@ body {
     transition: 0.3s;
 }
 
-/* 🕒 CLOCK */
+/* 🕒 TOP BAR */
 #topBar {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
     margin-bottom: 10px;
 }
 
+/* CLOCK */
 #clockBox {
-    font-size: 38px;
+    font-size: 44px;
     font-weight: bold;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border: 3px solid var(--border);
     border-radius: 12px;
 }
 
-/* 🌗 BUTTON */
+/* 🌗 BUTTON (มุมขวาบน เล็ก) */
 #themeBtn {
-    padding: 10px 15px;
-    font-size: 14px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 6px;
     cursor: pointer;
+    opacity: 0.7;
+    border: 1px solid var(--border);
+    background: var(--box);
+    color: var(--text);
 }
 
-/* layout */
+#themeBtn:hover {
+    opacity: 1;
+}
+
+/* MAIN */
 .main {
     display: flex;
     gap: 15px;
 }
 
-/* left */
+/* LEFT */
 .left-panel {
     width: 230px;
     border: 2px solid var(--border);
@@ -72,12 +85,12 @@ body {
     background: var(--box);
 }
 
-/* right */
+/* RIGHT */
 .right-panel {
     flex: 1;
 }
 
-/* boxes */
+/* BOXES */
 .wrapper {
     display: flex;
     gap: 15px;
@@ -93,7 +106,7 @@ body {
     background: var(--box);
 }
 
-/* cards */
+/* CARD */
 .card {
     background: var(--card);
     margin: 6px;
@@ -102,19 +115,20 @@ body {
     font-size: 14px;
 }
 
-#status {
-    font-size: 14px;
-    color: #4a90e2;
-    margin-top: 10px;
-}
-
-/* inputs */
+/* INPUT */
 select, button {
     width: 100%;
     font-size: 14px;
     padding: 5px;
     margin-top: 5px;
 }
+
+#status {
+    font-size: 14px;
+    color: #4a90e2;
+    margin-top: 10px;
+}
+
 </style>
 </head>
 
@@ -123,7 +137,7 @@ select, button {
 <!-- 🕒 TOP BAR -->
 <div id="topBar">
     <div id="clockBox">🕒 00:00:00</div>
-    <button id="themeBtn" onclick="toggleTheme()">🌙 โหมดกลางคืน</button>
+    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
 </div>
 
 <div class="main">
@@ -196,16 +210,25 @@ const data = {
 let status = {};
 let totalBreak = {};
 
-/* 🌗 THEME TOGGLE */
+/* 🌗 LOAD THEME */
+function loadTheme() {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+        document.getElementById("themeBtn").innerText = "☀️";
+    }
+}
+loadTheme();
+
+/* 🌗 TOGGLE */
 function toggleTheme() {
     document.body.classList.toggle("dark");
 
-    const btn = document.getElementById("themeBtn");
-
     if (document.body.classList.contains("dark")) {
-        btn.innerText = "☀️ โหมดกลางวัน";
+        localStorage.setItem("theme","dark");
+        document.getElementById("themeBtn").innerText = "☀️";
     } else {
-        btn.innerText = "🌙 โหมดกลางคืน";
+        localStorage.setItem("theme","light");
+        document.getElementById("themeBtn").innerText = "🌙";
     }
 }
 
@@ -247,7 +270,7 @@ function updateNames() {
     });
 }
 
-/* BREAK START */
+/* BREAK */
 function startBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
@@ -257,7 +280,6 @@ function startBreak() {
     render();
 }
 
-/* BREAK END */
 function endBreak() {
     const name = document.getElementById("nameSelect").value;
     if (!name) return alert("เลือกชื่อ");
