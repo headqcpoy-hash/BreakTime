@@ -2,21 +2,49 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบพักเบรค</title>
+<title>Dashboard QC / AD</title>
 
 <style>
-    body { font-family: sans-serif; text-align: center; padding: 50px; }
-    button { font-size: 20px; padding: 10px 20px; cursor: pointer; }
-    select { font-size: 18px; padding: 5px; }
-    #status { font-size: 24px; margin-top: 20px; color: blue; }
+body { font-family: sans-serif; padding: 20px; text-align:center; }
+
+select, button {
+    font-size: 18px;
+    padding: 6px;
+    margin: 5px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.box {
+    width: 45%;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.card {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.work { background: #c8f7c5; }
+.break { background: #ffe6a7; }
+
+#status { font-size: 20px; margin-top: 10px; color: blue; }
 </style>
 </head>
 
 <body>
 
-<h1>ระบบลงเวลาพักเบรค</h1>
+<h1>📊 QC / AD Dashboard</h1>
 
-<!-- ตำแหน่ง -->
+<!-- 🔥 ตำแหน่ง -->
 <select id="positionSelect" onchange="updateNames()">
     <option value="">เลือกตำแหน่ง</option>
     <option value="Head">Head</option>
@@ -30,86 +58,118 @@
     <option value="AD-STM">AD-STM</option>
 </select>
 
-<br><br>
-
-<!-- ชื่อ (จะเปลี่ยนตามตำแหน่ง) -->
+<!-- 🔥 ชื่อ -->
 <select id="nameSelect">
     <option value="">เลือกชื่อพนักงาน</option>
 </select>
 
-<br><br>
+<br>
 
-<button onclick="takeBreak()">พักเบรค</button>
-<button onclick="backToWork()">กลับมา</button>
+<button onclick="setBreak()">พักเบรค</button>
+<button onclick="setWork()">กลับมา</button>
 
 <div id="status">สถานะ: -</div>
 
+<hr>
+
+<div class="container">
+    <div class="box">
+        <h2>QC</h2>
+        <div id="qcBox"></div>
+    </div>
+
+    <div class="box">
+        <h2>AD</h2>
+        <div id="adBox"></div>
+    </div>
+</div>
+
 <script>
 
-/* 🔥 mapping ตำแหน่ง → ชื่อ */
+/* 🔥 DATA ตามที่คุณกำหนด */
 const data = {
-    "Head": ["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 
-    "QC-SA": ["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
+Head: ["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 
-    "QC-SV": ["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+"QC-SA": ["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
 
-    "QC-PR": ["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
+"QC-SV": ["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
 
-    "QC-AI": ["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
+"QC-PR": ["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
 
-    "QC-MKT": ["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
+"QC-AI": ["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
 
-    "QC-Support": ["เบล","อุ้ม"],
+"QC-MKT": ["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
 
-    "AD-BO": ["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่ 789","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง 786","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่ 168","นิ"],
+"QC-Support": ["เบล","อุ้ม"],
 
-    "AD-STM": ["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
+"AD-BO": ["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่ 789","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง 786","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่ 168","นิ"],
+
+"AD-STM": ["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
+let status = {};
 
-/* 🔥 เปลี่ยนรายชื่อเมื่อเลือกตำแหน่ง */
+/* 🔥 เปลี่ยนชื่ออัตโนมัติ */
 function updateNames() {
-    const pos = document.getElementById('positionSelect').value;
-    const nameSelect = document.getElementById('nameSelect');
+    const pos = document.getElementById("positionSelect").value;
+    const select = document.getElementById("nameSelect");
 
-    nameSelect.innerHTML = '<option value="">เลือกชื่อพนักงาน</option>';
+    select.innerHTML = '<option value="">เลือกชื่อพนักงาน</option>';
 
-    if (!pos || !data[pos]) return;
+    if (!data[pos]) return;
 
     data[pos].forEach(name => {
-        const opt = document.createElement("option");
+        let opt = document.createElement("option");
         opt.value = name;
         opt.textContent = name;
-        nameSelect.appendChild(opt);
+        select.appendChild(opt);
     });
 }
 
+/* 🔥 พัก */
+function setBreak() {
+    const name = document.getElementById("nameSelect").value;
+    if (!name) return alert("เลือกชื่อ");
 
-/* 🔥 พักเบรค */
-function takeBreak() {
-    const name = document.getElementById('nameSelect').value;
-    const pos = document.getElementById('positionSelect').value;
-
-    if (!pos) return alert("กรุณาเลือกตำแหน่ง");
-    if (!name) return alert("กรุณาเลือกชื่อ");
-
-    document.getElementById('status').innerText =
-        `${name} (${pos}) พักเบรค ☕`;
+    status[name] = "break";
+    document.getElementById("status").innerText = name + " พักเบรค ☕";
+    render();
 }
 
+/* 🔥 ทำงาน */
+function setWork() {
+    const name = document.getElementById("nameSelect").value;
+    if (!name) return alert("เลือกชื่อ");
 
-/* 🔥 กลับมา */
-function backToWork() {
-    const name = document.getElementById('nameSelect').value;
-    const pos = document.getElementById('positionSelect').value;
-
-    if (!pos) return alert("กรุณาเลือกตำแหน่ง");
-    if (!name) return alert("กรุณาเลือกชื่อ");
-
-    document.getElementById('status').innerText =
-        `${name} (${pos}) กลับมาทำงาน 💻`;
+    status[name] = "work";
+    document.getElementById("status").innerText = name + " กลับมาทำงาน 💻";
+    render();
 }
+
+/* 🔥 render dashboard */
+function render() {
+    document.getElementById("qcBox").innerHTML =
+        data["QC-SA"].concat(data["QC-SV"], data["QC-PR"], data["QC-AI"], data["QC-MKT"], data["QC-Support"], data["Head"])
+        .map(n => card(n)).join("");
+
+    document.getElementById("adBox").innerHTML =
+        data["AD-BO"].concat(data["AD-STM"])
+        .map(n => card(n)).join("");
+}
+
+/* 🔥 card */
+function card(name) {
+    let state = status[name] || "work";
+    let cls = state === "break" ? "card break" : "card work";
+    let txt = state === "break" ? "☕ พัก" : "💻 ทำงาน";
+
+    return `<div class="${cls}">
+        ${name} - ${txt}
+    </div>`;
+}
+
+render();
 
 </script>
 
