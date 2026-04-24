@@ -1,1 +1,323 @@
-<!DOCTYPE html> <html lang="th"> <head> <meta charset="UTF-8"> <title>Break Dashboard</title> <style> /* 🎨 THEME */ :root { --bg:#fff; --text:#000; --box:#fff; --border:#ccc; --card:#ffe6a7; } body.dark { --bg:#121212; --text:#fff; --box:#1e1e1e; --border:#444; --card:#333; } body { margin:0; padding:15px; font-family:sans-serif; background:var(--bg); color:var(--text); } /* 🕒 CLOCK */ #topBar { position:relative; display:flex; justify-content:center; margin-bottom:10px; } #clockBox { font-size:40px; font-weight:bold; padding:10px 20px; border:3px solid var(--border); border-radius:12px; text-align:center; } /* 🌙 BUTTON */ #themeBtn { position:absolute; right:10px; top:10px; width:28px; height:28px; border-radius:6px; border:1px solid var(--border); cursor:pointer; } body:not(.dark) #themeBtn { background:#fff; color:#000; } body.dark #themeBtn { background:#000; color:#fff; } /* LAYOUT */ .main { display:flex; gap:15px; } /* LEFT */ .left-panel { width:230px; border:2px solid var(--border); border-radius:10px; padding:10px; background:var(--box); } /* RIGHT */ .right-panel { flex:1; } .wrapper { display:flex; gap:15px; flex-wrap:wrap; } .box { flex:1; min-width:320px; border:2px solid var(--border); border-radius:10px; padding:10px; background:var(--box); } /* HEADER TABLE */ .table-header { display:flex; font-weight:bold; font-size:12px; padding:6px 8px; border-bottom:2px solid var(--border); margin-bottom:6px; } .table-header div { flex:1; } .table-header div:last-child { text-align:right; } /* ROW */ .card.row { display:flex; padding:8px; margin:5px; border-radius:8px; background:var(--card); } .col { flex:1; font-size:13px; } .col.pos { color:#4a90e2; font-weight:bold; } .col.name { font-weight:bold; } .col.time { text-align:right; font-family:monospace; } /* INPUT */ select, button { width:100%; margin-top:5px; padding:5px; font-size:14px; } #status { margin-top:10px; font-size:14px; color:#4a90e2; } </style> </head> <body> <div id="topBar"> <div id="clockBox">🕒</div> <button id="themeBtn" onclick="toggleTheme()">🌙</button> </div> <div class="main"> <!-- LEFT --> <div class="left-panel"> <h4>☕ ลงเวลา</h4> <select id="positionSelect" onchange="updateNames()"> <option value="">ตำแหน่ง</option> <option>Head</option> <option>QC-SA</option> <option>QC-SV</option> <option>QC-PR</option> <option>QC-AI</option> <option>QC-MKT</option> <option>QC-Support</option> <option>AD-BO</option> <option>AD-STM</option> </select> <select id="nameSelect"><option>ชื่อ</option></select> <button onclick="startBreak()">พัก ☕</button> <button onclick="endBreak()">กลับ 💻</button> <div id="status">-</div> </div> <!-- RIGHT --> <div class="right-panel"> <div class="wrapper"> <!-- BREAK --> <div class="box"> <h3>⏳ กำลังพัก</h3> <div class="table-header"> <div>ตำแหน่ง</div> <div>ชื่อ</div> <div>ระยะเวลา</div> </div> <div id="breakBox"></div> </div> <!-- TOTAL --> <div class="box"> <h3>🧮 เวลาสะสม</h3> <div class="table-header"> <div>ตำแหน่ง</div> <div>ชื่อ</div> <div>ระยะเวลา</div> </div> <div id="totalBox"></div> </div> </div> </div> </div> <script> /* DATA */ const data = { "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"], "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"], "QC-SV":["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"], "QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"], "QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"], "QC-MKT":["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"], "QC-Support":["เบล","อุ้ม"], "AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่","นิ"], "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"] }; let status = {}; let total = {}; /* CLOCK */ function clock(){ const n=new Date(); const d=String(n.getDate()).padStart(2,'0'); const m=String(n.getMonth()+1).padStart(2,'0'); const y=n.getFullYear(); const hh=String(n.getHours()).padStart(2,'0'); const mm=String(n.getMinutes()).padStart(2,'0'); const ss=String(n.getSeconds()).padStart(2,'0'); const day=["อา","จ","อ","พ","พฤ","ศ","ส"]; document.getElementById("clockBox").innerHTML= 🕒 ${hh}:${mm}:${ss}<br>📅 ${d}/${m}/${y} (${day[n.getDay()]}); } setInterval(clock,1000); clock(); /* THEME */ function toggleTheme(){ document.body.classList.toggle("dark"); } /* NAME */ function updateNames(){ let p=document.getElementById("positionSelect").value; let s=document.getElementById("nameSelect"); s.innerHTML="<option>ชื่อ</option>"; (data[p]||[]).forEach(n=>{ let o=document.createElement("option"); o.text=n; o.value=n; s.appendChild(o); }); } /* BREAK */ function startBreak(){ let n=document.getElementById("nameSelect").value; if(!n)return alert("เลือกชื่อ"); status[n]=Date.now(); } function endBreak(){ let n=document.getElementById("nameSelect").value; if(!n)return; if(status[n]){ let sec=(Date.now()-status[n])/1000; total[n]=(total[n]||0)+sec; delete status[n]; } } /* FORMAT */ function f(ms){ let s=Math.floor(ms/1000); let m=String(Math.floor(s/60)).padStart(2,'0'); let r=String(s%60).padStart(2,'0'); return ${m}:${r}; } /* POSITION */ function pos(n){ for(let p in data){ if(data[p].includes(n))return p; } return "-"; } /* BREAK RENDER */ function render(){ let b=document.getElementById("breakBox"); b.innerHTML=""; Object.keys(status).forEach(n=>{ b.innerHTML+= <div class="card row"> <div class="col pos">${pos(n)}</div> <div class="col name">${n}</div> <div class="col time">${f(Date.now()-status[n])}</div> </div>; }); } /* TOTAL RENDER */ function renderTotal(){ let b=document.getElementById("totalBox"); b.innerHTML=""; Object.keys(total).forEach(n=>{ b.innerHTML+= <div class="card row"> <div class="col pos">${pos(n)}</div> <div class="col name">${n}</div> <div class="col time">${f(total[n]*1000)}</div> </div>; }); } setInterval(()=>{ render(); renderTotal(); },1000); </script> </body> </html> ผูกกับชีตอย่างไร https://docs.google.com/spreadsheets/d/1QpjJZX5OHQ5bTNv1kEpYTYpSIkVlrKvdD6H8Uy3JUIw/edit?gid=0#gid=0
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Break Dashboard</title>
+
+<style>
+:root {
+    --bg: #0a0a0a; 
+    --text: #e0e0e0; 
+    --box: #1a1a1a;
+    --border: #c5a059; 
+    --card: #b8860b; 
+    --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+} 
+}
+
+body.dark {
+    --bg:#121212;
+    --text:#fff;
+    --box:#1e1e1e;
+    --border:#444;
+    --card:#333;
+}
+
+body {
+    margin:0;
+    padding:15px;
+    font-family:sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+#topBar {
+    position:relative;
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+}
+
+#clockBox {
+    font-size:40px;
+    font-weight:bold;
+    padding:10px 20px;
+    border:3px solid var(--border);
+    border-radius:12px;
+    text-align:center;
+}
+
+#themeBtn {
+    position:absolute;
+    right:10px;
+    top:10px;
+    width:28px;
+    height:28px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    cursor:pointer;
+}
+
+body:not(.dark) #themeBtn { background:#fff; color:#000; }
+body.dark #themeBtn { background:#000; color:#fff; }
+
+.main { display:flex; gap:15px; }
+
+.left-panel {
+    width:230px;
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    background:var(--box);
+}
+
+.right-panel { flex:1; }
+
+.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
+
+.box {
+    flex:1;
+    min-width:320px;
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    background:var(--box);
+}
+
+.table-header {
+    display:flex;
+    font-weight:bold;
+    font-size:12px;
+    padding:6px 8px;
+    border-bottom:2px solid var(--border);
+    margin-bottom:6px;
+}
+
+.table-header div { flex:1; }
+.table-header div:last-child { text-align:right; }
+
+.card.row {
+    display:flex;
+    padding:8px;
+    margin:5px;
+    border-radius:8px;
+    background:var(--card);
+}
+
+.col { flex:1; font-size:13px; }
+.col.pos { color:#4a90e2; font-weight:bold; }
+.col.name { font-weight:bold; }
+.col.time { text-align:right; font-family:monospace; }
+
+select, button {
+    width:100%;
+    margin-top:5px;
+    padding:5px;
+    font-size:14px;
+}
+
+#status {
+    margin-top:10px;
+    font-size:14px;
+    color:#4a90e2;
+}
+</style>
+</head>
+
+<body>
+
+<div id="topBar">
+    <div id="clockBox">🕒</div>
+    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+</div>
+
+<div class="main">
+
+<!-- LEFT -->
+<div class="left-panel">
+
+<h4>☕ ลงเวลา</h4>
+
+<select id="positionSelect" onchange="updateNames()">
+    <option value="">ตำแหน่ง</option>
+    <option>Head</option>
+    <option>QC-SA</option>
+    <option>QC-SV</option>
+    <option>QC-PR</option>
+    <option>QC-AI</option>
+    <option>QC-MKT</option>
+    <option>QC-Support</option>
+    <option>AD-BO</option>
+    <option>AD-STM</option>
+</select>
+
+<select id="nameSelect">
+    <option>ชื่อ</option>
+</select>
+
+<button onclick="startBreak()">พัก ☕</button>
+<button onclick="endBreak()">กลับ 💻</button>
+
+<div id="status">-</div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="right-panel">
+
+<div class="wrapper">
+
+<div class="box">
+    <h3>⏳ กำลังพัก</h3>
+    <div class="table-header">
+        <div>ตำแหน่ง</div>
+        <div>ชื่อ</div>
+        <div>ระยะเวลา</div>
+    </div>
+    <div id="breakBox"></div>
+</div>
+
+<div class="box">
+    <h3>🧮 เวลาสะสม</h3>
+    <div class="table-header">
+        <div>ตำแหน่ง</div>
+        <div>ชื่อ</div>
+        <div>ระยะเวลา</div>
+    </div>
+    <div id="totalBox"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+/* DATA */
+const data = {
+"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
+"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
+"QC-SV":["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
+"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
+"QC-MKT":["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
+"QC-Support":["เบล","อุ้ม"],
+"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่","นิ"],
+"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
+};
+
+let status = {};
+let total = {};
+
+/* CLOCK */
+function clock(){
+    const n=new Date();
+    const d=String(n.getDate()).padStart(2,'0');
+    const m=String(n.getMonth()+1).padStart(2,'0');
+    const y=n.getFullYear();
+    const hh=String(n.getHours()).padStart(2,'0');
+    const mm=String(n.getMinutes()).padStart(2,'0');
+    const ss=String(n.getSeconds()).padStart(2,'0');
+    const day=["อา","จ","อ","พ","พฤ","ศ","ส"];
+
+    document.getElementById("clockBox").innerHTML =
+    `🕒 ${hh}:${mm}:${ss}<br>📅 ${d}/${m}/${y} (${day[n.getDay()]})`;
+}
+setInterval(clock,1000);
+clock();
+
+/* THEME */
+function toggleTheme(){
+    document.body.classList.toggle("dark");
+}
+
+/* NAME */
+function updateNames(){
+    let p=document.getElementById("positionSelect").value;
+    let s=document.getElementById("nameSelect");
+
+    s.innerHTML="<option>ชื่อ</option>";
+
+    (data[p]||[]).forEach(n=>{
+        let o=document.createElement("option");
+        o.text=n;
+        o.value=n;
+        s.appendChild(o);
+    });
+}
+
+/* START */
+function startBreak(){
+    let n=document.getElementById("nameSelect").value;
+    if(!n) return alert("เลือกชื่อ");
+    status[n]=Date.now();
+}
+
+/* END */
+function endBreak(){
+    let n=document.getElementById("nameSelect").value;
+    if(!n) return;
+
+    if(status[n]){
+        let sec=(Date.now()-status[n])/1000;
+        total[n]=(total[n]||0)+sec;
+        delete status[n];
+    }
+}
+
+/* FORMAT */
+function f(ms){
+    let s=Math.floor(ms/1000);
+    let m=String(Math.floor(s/60)).padStart(2,'0');
+    let r=String(s%60).padStart(2,'0');
+    return `${m}:${r}`;
+}
+
+/* POSITION */
+function pos(n){
+    for(let p in data){
+        if(data[p].includes(n)) return p;
+    }
+    return "-";
+}
+
+/* RENDER BREAK */
+function render(){
+    let b=document.getElementById("breakBox");
+    b.innerHTML="";
+
+    Object.keys(status).forEach(n=>{
+        b.innerHTML+=`
+        <div class="card row">
+            <div class="col pos">${pos(n)}</div>
+            <div class="col name">${n}</div>
+            <div class="col time">${f(Date.now()-status[n])}</div>
+        </div>`;
+    });
+}
+
+/* RENDER TOTAL */
+function renderTotal(){
+    let b=document.getElementById("totalBox");
+    b.innerHTML="";
+
+    Object.keys(total).forEach(n=>{
+        b.innerHTML+=`
+        <div class="card row">
+            <div class="col pos">${pos(n)}</div>
+            <div class="col name">${n}</div>
+            <div class="col time">${f(total[n]*1000)}</div>
+        </div>`;
+    });
+}
+
+/* LOOP */
+setInterval(()=>{
+    render();
+    renderTotal();
+},1000);
+
+</script>
+
+</body>
+</html>
