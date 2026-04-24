@@ -6,61 +6,118 @@
 
 <style>
 :root {
-    --bg: #fdfdfd;          
-    --text: #2c2c2c;        
-    --box: #ffffff;        
-    --border: #e0d5ba;     
-    --card: #faf7f0;       
-    
-  
-    --gold-main: #b8860b;
-    --gold-gradient: linear-gradient(135deg, #bd9333 0%, #f3e092 50%, #8e6d28 100%);
-    --gold-shadow: 0 10px 30px rgba(184, 134, 11, 0.1);
+    --bg:#fff;
+    --text:#000;
+    --box:#fff;
+    --border:#ccc;
+    --card:#ffe6a7;
 }
 
-
-[data-theme="dark"] {
-    --bg: #0a0a0a;
-    --text: #f4f4f4;
-    --box: #161616;
-    --border: #4a3f28;
-    --card: #1c1c1c;
-    
-    --gold-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+body.dark {
+    --bg:#121212;
+    --text:#fff;
+    --box:#1e1e1e;
+    --border:#444;
+    --card:#333;
 }
-
 
 body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    transition: all 0.3s ease;
+    margin:0;
+    padding:15px;
+    font-family:sans-serif;
+    background:var(--bg);
+    color:var(--text);
 }
 
-.luxury-card {
-    background-color: var(--card);
-    border: 1px solid var(--border);
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: var(--gold-shadow);
+#topBar {
+    position:relative;
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
 }
 
-.gold-heading {
-    background: var(--gold-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
+#clockBox {
+    font-size:40px;
+    font-weight:bold;
+    padding:10px 20px;
+    border:3px solid var(--border);
+    border-radius:12px;
+    text-align:center;
 }
 
-.btn-luxury {
-    background: var(--gold-gradient);
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(189, 147, 51, 0.3);
+#themeBtn {
+    position:absolute;
+    right:10px;
+    top:10px;
+    width:28px;
+    height:28px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    cursor:pointer;
+}
+
+body:not(.dark) #themeBtn { background:#fff; color:#000; }
+body.dark #themeBtn { background:#000; color:#fff; }
+
+.main { display:flex; gap:15px; }
+
+.left-panel {
+    width:230px;
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    background:var(--box);
+}
+
+.right-panel { flex:1; }
+
+.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
+
+.box {
+    flex:1;
+    min-width:320px;
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    background:var(--box);
+}
+
+.table-header {
+    display:flex;
+    font-weight:bold;
+    font-size:12px;
+    padding:6px 8px;
+    border-bottom:2px solid var(--border);
+    margin-bottom:6px;
+}
+
+.table-header div { flex:1; }
+.table-header div:last-child { text-align:right; }
+
+.card.row {
+    display:flex;
+    padding:8px;
+    margin:5px;
+    border-radius:8px;
+    background:var(--card);
+}
+
+.col { flex:1; font-size:13px; }
+.col.pos { color:#4a90e2; font-weight:bold; }
+.col.name { font-weight:bold; }
+.col.time { text-align:right; font-family:monospace; }
+
+select, button {
+    width:100%;
+    margin-top:5px;
+    padding:5px;
+    font-size:14px;
+}
+
+#status {
+    margin-top:10px;
+    font-size:14px;
+    color:#4a90e2;
 }
 </style>
 </head>
