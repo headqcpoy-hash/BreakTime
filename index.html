@@ -1,7 +1,6 @@
 <script>
 
-/* 🔗 API */
-const API = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwo2zebK-NqsoQ0fpiYIPyJQBOJ4rP8BtdES6XzQ8SJoxuQJdh9WsPDC6IdRf2nX7x_5Q/exec";
+const API = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbxvGdIn5q_SjaRIXUrkDnQLHB-yraMqmGgoCyLhtrR2-7SERlRmbXdD_Mq_-Yab8yPcVA/exec";
 
 /* DATA */
 const data = {
@@ -16,12 +15,11 @@ const data = {
 "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
-let status = {};
-let total = {};
+let sheetData = [];
 
 /* CLOCK */
 function clock(){
-    const el = document.getElementById("clockBox");
+    const el=document.getElementById("clockBox");
     if(!el) return;
 
     const n=new Date();
@@ -50,10 +48,9 @@ function updateNames(){
     const s=document.getElementById("nameSelect");
     if(!p || !s) return;
 
-    let val=p.value;
     s.innerHTML="<option>ชื่อ</option>";
 
-    (data[val]||[]).forEach(n=>{
+    (data[p.value]||[]).forEach(n=>{
         let o=document.createElement("option");
         o.text=n;
         o.value=n;
@@ -61,7 +58,7 @@ function updateNames(){
     });
 }
 
-/* START */
+/* SEND START */
 function startBreak(){
     let n=document.getElementById("nameSelect")?.value;
     let p=document.getElementById("positionSelect")?.value;
@@ -70,86 +67,98 @@ function startBreak(){
 
     fetch(API,{
         method:"POST",
-        body: JSON.stringify({
+        body:JSON.stringify({
             type:"start",
             name:n,
             position:p
         })
     }).catch(()=>{});
-
-    status[n]=Date.now();
 }
 
-/* END */
+/* SEND END */
 function endBreak(){
     let n=document.getElementById("nameSelect")?.value;
     if(!n) return;
 
     fetch(API,{
         method:"POST",
-        body: JSON.stringify({
+        body:JSON.stringify({
             type:"end",
             name:n
         })
     }).catch(()=>{});
-
-    if(status[n]){
-        let sec=(Date.now()-status[n])/1000;
-        total[n]=(total[n]||0)+sec;
-        delete status[n];
-    }
 }
 
-/* FORMAT */
-function f(ms){
-    let s=Math.floor(ms/1000);
-    let m=String(Math.floor(s/60)).padStart(2,'0');
-    let r=String(s%60).padStart(2,'0');
-    return `${m}:${r}`;
+/* LOAD SHEET (REAL TIME) */
+async function loadData(){
+    try{
+        const res = await fetch(API);
+        sheetData = await res.json();
+    }catch(e){}
 }
+setInterval(loadData,3000);
+loadData();
 
-/* POS */
-function pos(n){
+/* POSITION */
+function getPos(n){
     for(let p in data){
-        if(data[p].includes(n))return p;
+        if(data[p].includes(n)) return p;
     }
     return "-";
 }
 
-/* RENDER (กันพัง 100%) */
+/* BREAK RENDER */
 function render(){
     const b=document.getElementById("breakBox");
     if(!b) return;
 
     b.innerHTML="";
-    Object.keys(status).forEach(n=>{
+
+    sheetData.forEach(r=>{
+        if(!r[2] || r[3]) return;
+
         b.innerHTML+=`
         <div class="card row">
-            <div class="col pos">${pos(n)}</div>
-            <div class="col name">${n}</div>
-            <div class="col time">${f(Date.now()-status[n])}</div>
+            <div class="col pos">${r[1]}</div>
+            <div class="col name">${r[0]}</div>
+            <div class="col time">กำลังพัก</div>
         </div>`;
     });
 }
 
+/* TOTAL DASHBOARD */
 function renderTotal(){
     const b=document.getElementById("totalBox");
     if(!b) return;
 
+    let map = {};
+
+    sheetData.forEach(r=>{
+        if(r[2] && r[3]){
+            let sec = (new Date(r[3]) - new Date(r[2]))/1000;
+            map[r[0]] = (map[r[0]]||0) + sec;
+        }
+    });
+
     b.innerHTML="";
-    Object.keys(total).forEach(n=>{
+
+    Object.keys(map).forEach(n=>{
+        let m=Math.floor(map[n]/60);
+        let s=Math.floor(map[n]%60);
+
         b.innerHTML+=`
         <div class="card row">
-            <div class="col pos">${pos(n)}</div>
+            <div class="col pos">${getPos(n)}</div>
             <div class="col name">${n}</div>
-            <div class="col time">${f(total[n]*1000)}</div>
+            <div class="col time">${m}:${String(s).padStart(2,'0')}</div>
         </div>`;
     });
 }
 
+/* LOOP */
 setInterval(()=>{
     render();
     renderTotal();
-},1000);
+},2000);
 
 </script>
