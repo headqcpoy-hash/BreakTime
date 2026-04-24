@@ -1,8 +1,13 @@
 <script>
 
-const API = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbxvGdIn5q_SjaRIXUrkDnQLHB-yraMqmGgoCyLhtrR2-7SERlRmbXdD_Mq_-Yab8yPcVA/exec";
+/* =========================
+   🔗 GOOGLE SHEET API
+========================= */
+const API = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwo2zebK-NqsoQ0fpiYIPyJQBOJ4rP8BtdES6XzQ8SJoxuQJdh9WsPDC6IdRf2nX7x_5Q/exec";
 
-/* DATA */
+/* =========================
+   👥 DATA (UI เดิมคุณ)
+========================= */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -15,9 +20,14 @@ const data = {
 "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
+/* =========================
+   ☁️ REALTIME DATA
+========================= */
 let sheetData = [];
 
-/* CLOCK */
+/* =========================
+   🕒 CLOCK
+========================= */
 function clock(){
     const el=document.getElementById("clockBox");
     if(!el) return;
@@ -37,12 +47,16 @@ function clock(){
 setInterval(clock,1000);
 clock();
 
-/* THEME */
+/* =========================
+   🌙 THEME
+========================= */
 function toggleTheme(){
     document.body.classList.toggle("dark");
 }
 
-/* NAME */
+/* =========================
+   👤 NAME SELECT
+========================= */
 function updateNames(){
     const p=document.getElementById("positionSelect");
     const s=document.getElementById("nameSelect");
@@ -58,7 +72,9 @@ function updateNames(){
     });
 }
 
-/* SEND START */
+/* =========================
+   ☕ START BREAK
+========================= */
 function startBreak(){
     let n=document.getElementById("nameSelect")?.value;
     let p=document.getElementById("positionSelect")?.value;
@@ -73,9 +89,13 @@ function startBreak(){
             position:p
         })
     }).catch(()=>{});
+
+    status[n]=Date.now();
 }
 
-/* SEND END */
+/* =========================
+   💻 END BREAK
+========================= */
 function endBreak(){
     let n=document.getElementById("nameSelect")?.value;
     if(!n) return;
@@ -87,27 +107,43 @@ function endBreak(){
             name:n
         })
     }).catch(()=>{});
+
+    if(status[n]){
+        let sec=(Date.now()-status[n])/1000;
+        total[n]=(total[n]||0)+sec;
+        delete status[n];
+    }
 }
 
-/* LOAD SHEET (REAL TIME) */
+/* =========================
+   ☁️ LOAD SHEET (REALTIME)
+========================= */
 async function loadData(){
     try{
         const res = await fetch(API);
-        sheetData = await res.json();
-    }catch(e){}
+        const txt = await res.text();
+        sheetData = JSON.parse(txt);
+        if(!Array.isArray(sheetData)) sheetData=[];
+    }catch(e){
+        sheetData=[];
+    }
 }
 setInterval(loadData,3000);
 loadData();
 
-/* POSITION */
-function getPos(n){
+/* =========================
+   🧠 POSITION FINDER
+========================= */
+function pos(n){
     for(let p in data){
         if(data[p].includes(n)) return p;
     }
     return "-";
 }
 
-/* BREAK RENDER */
+/* =========================
+   ⏳ BREAK RENDER
+========================= */
 function render(){
     const b=document.getElementById("breakBox");
     if(!b) return;
@@ -119,24 +155,26 @@ function render(){
 
         b.innerHTML+=`
         <div class="card row">
-            <div class="col pos">${r[1]}</div>
-            <div class="col name">${r[0]}</div>
+            <div class="col pos">${r[1]||"-"}</div>
+            <div class="col name">${r[0]||"-"}</div>
             <div class="col time">กำลังพัก</div>
         </div>`;
     });
 }
 
-/* TOTAL DASHBOARD */
+/* =========================
+   🧮 TOTAL DASHBOARD
+========================= */
 function renderTotal(){
     const b=document.getElementById("totalBox");
     if(!b) return;
 
-    let map = {};
+    let map={};
 
     sheetData.forEach(r=>{
         if(r[2] && r[3]){
-            let sec = (new Date(r[3]) - new Date(r[2]))/1000;
-            map[r[0]] = (map[r[0]]||0) + sec;
+            let sec=(new Date(r[3])-new Date(r[2]))/1000;
+            map[r[0]]=(map[r[0]]||0)+sec;
         }
     });
 
@@ -148,17 +186,19 @@ function renderTotal(){
 
         b.innerHTML+=`
         <div class="card row">
-            <div class="col pos">${getPos(n)}</div>
+            <div class="col pos">${pos(n)}</div>
             <div class="col name">${n}</div>
             <div class="col time">${m}:${String(s).padStart(2,'0')}</div>
         </div>`;
     });
 }
 
-/* LOOP */
+/* =========================
+   🔁 LOOP REALTIME
+========================= */
 setInterval(()=>{
     render();
     renderTotal();
-},2000);
+},1000);
 
 </script>
