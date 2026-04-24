@@ -1,252 +1,8 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<title>Break Dashboard</title>
-
-<style>
-
-/* 🎨 THEME */
-:root {
-    --bg:#fff;
-    --text:#000;
-    --box:#fff;
-    --border:#ccc;
-    --card:#ffe6a7;
-}
-
-body.dark {
-    --bg:#121212;
-    --text:#fff;
-    --box:#1e1e1e;
-    --border:#444;
-    --card:#333;
-}
-
-body {
-    margin:0;
-    padding:15px;
-    font-family:sans-serif;
-    background:var(--bg);
-    color:var(--text);
-}
-
-/* 🕒 CLOCK */
-#topBar {
-    position:relative;
-    display:flex;
-    justify-content:center;
-    margin-bottom:10px;
-}
-
-#clockBox {
-    font-size:40px;
-    font-weight:bold;
-    padding:10px 20px;
-    border:3px solid var(--border);
-    border-radius:12px;
-    text-align:center;
-}
-
-/* 🌙 BUTTON */
-#themeBtn {
-    position:absolute;
-    right:10px;
-    top:10px;
-    width:28px;
-    height:28px;
-    border-radius:6px;
-    border:1px solid var(--border);
-    cursor:pointer;
-}
-
-body:not(.dark) #themeBtn {
-    background:#fff;
-    color:#000;
-}
-
-body.dark #themeBtn {
-    background:#000;
-    color:#fff;
-}
-
-/* LAYOUT */
-.main {
-    display:flex;
-    gap:15px;
-}
-
-/* LEFT */
-.left-panel {
-    width:230px;
-    border:2px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-    background:var(--box);
-}
-
-/* RIGHT */
-.right-panel {
-    flex:1;
-}
-
-.wrapper {
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-}
-
-.box {
-    flex:1;
-    min-width:320px;
-    border:2px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-    background:var(--box);
-}
-
-/* HEADER TABLE */
-.table-header {
-    display:flex;
-    font-weight:bold;
-    font-size:12px;
-    padding:6px 8px;
-    border-bottom:2px solid var(--border);
-    margin-bottom:6px;
-}
-
-.table-header div {
-    flex:1;
-}
-
-.table-header div:last-child {
-    text-align:right;
-}
-
-/* ROW */
-.card.row {
-    display:flex;
-    padding:8px;
-    margin:5px;
-    border-radius:8px;
-    background:var(--card);
-}
-
-.col {
-    flex:1;
-    font-size:13px;
-}
-
-.col.pos {
-    color:#4a90e2;
-    font-weight:bold;
-}
-
-.col.name {
-    font-weight:bold;
-}
-
-.col.time {
-    text-align:right;
-    font-family:monospace;
-}
-
-/* INPUT */
-select, button {
-    width:100%;
-    margin-top:5px;
-    padding:5px;
-    font-size:14px;
-}
-
-#status {
-    margin-top:10px;
-    font-size:14px;
-    color:#4a90e2;
-}
-
-</style>
-</head>
-
-<body>
-
-<div id="topBar">
-    <div id="clockBox">🕒</div>
-    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
-</div>
-
-<div class="main">
-
-<!-- LEFT -->
-<div class="left-panel">
-
-<h4>☕ ลงเวลา</h4>
-
-<select id="positionSelect" onchange="updateNames()">
-    <option value="">ตำแหน่ง</option>
-    <option>Head</option>
-    <option>QC-SA</option>
-    <option>QC-SV</option>
-    <option>QC-PR</option>
-    <option>QC-AI</option>
-    <option>QC-MKT</option>
-    <option>QC-Support</option>
-    <option>AD-BO</option>
-    <option>AD-STM</option>
-</select>
-
-<select id="nameSelect"><option>ชื่อ</option></select>
-
-<button onclick="startBreak()">พัก ☕</button>
-<button onclick="endBreak()">กลับ 💻</button>
-
-<div id="status">-</div>
-
-</div>
-
-<!-- RIGHT -->
-<div class="right-panel">
-
-<div class="wrapper">
-
-<!-- BREAK -->
-<div class="box">
-    <h3>⏳ กำลังพัก</h3>
-
-    <div class="table-header">
-        <div>ตำแหน่ง</div>
-        <div>ชื่อ</div>
-        <div>ระยะเวลา</div>
-    </div>
-
-    <div id="breakBox"></div>
-</div>
-
-<!-- TOTAL -->
-<div class="box">
-    <h3>🧮 เวลาสะสม</h3>
-
-    <div class="table-header">
-        <div>ตำแหน่ง</div>
-        <div>ชื่อ</div>
-        <div>ระยะเวลา</div>
-    </div>
-
-    <div id="totalBox"></div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
 <script>
+
+/* 🔗 API */
 const API = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwo2zebK-NqsoQ0fpiYIPyJQBOJ4rP8BtdES6XzQ8SJoxuQJdh9WsPDC6IdRf2nX7x_5Q/exec";
 
-let status = {};
-let total = {};
-    
 /* DATA */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
@@ -266,15 +22,12 @@ let total = {};
 /* CLOCK */
 function clock(){
     const n=new Date();
-
     const d=String(n.getDate()).padStart(2,'0');
     const m=String(n.getMonth()+1).padStart(2,'0');
     const y=n.getFullYear();
-
     const hh=String(n.getHours()).padStart(2,'0');
     const mm=String(n.getMinutes()).padStart(2,'0');
     const ss=String(n.getSeconds()).padStart(2,'0');
-
     const day=["อา","จ","อ","พ","พฤ","ศ","ส"];
 
     document.getElementById("clockBox").innerHTML=
@@ -301,16 +54,37 @@ function updateNames(){
     });
 }
 
-/* BREAK */
+/* START */
 function startBreak(){
     let n=document.getElementById("nameSelect").value;
-    if(!n)return alert("เลือกชื่อ");
+    let p=document.getElementById("positionSelect").value;
+
+    if(!n || !p) return alert("เลือกชื่อ/ตำแหน่ง");
+
+    fetch(API,{
+        method:"POST",
+        body: JSON.stringify({
+            type:"start",
+            name:n,
+            position:p
+        })
+    });
+
     status[n]=Date.now();
 }
 
+/* END */
 function endBreak(){
     let n=document.getElementById("nameSelect").value;
-    if(!n)return;
+    if(!n) return;
+
+    fetch(API,{
+        method:"POST",
+        body: JSON.stringify({
+            type:"end",
+            name:n
+        })
+    });
 
     if(status[n]){
         let sec=(Date.now()-status[n])/1000;
@@ -327,7 +101,7 @@ function f(ms){
     return `${m}:${r}`;
 }
 
-/* POSITION */
+/* POS */
 function pos(n){
     for(let p in data){
         if(data[p].includes(n))return p;
@@ -335,7 +109,7 @@ function pos(n){
     return "-";
 }
 
-/* BREAK RENDER */
+/* RENDER */
 function render(){
     let b=document.getElementById("breakBox");
     b.innerHTML="";
@@ -349,7 +123,6 @@ function render(){
     });
 }
 
-/* TOTAL RENDER */
 function renderTotal(){
     let b=document.getElementById("totalBox");
     b.innerHTML="";
@@ -369,6 +142,3 @@ setInterval(()=>{
 },1000);
 
 </script>
-
-</body>
-</html>
