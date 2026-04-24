@@ -6,121 +6,74 @@
 
 <style>
 :root {
-    --bg: #0a0a0a; 
-    --text: #e0e0e0; 
-    --box: #1a1a1a;
-    --border: #c5a059; 
-    --card: #b8860b; 
-    --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-} 
+    --bg: #0a0a0a;           /* พื้นหลังดำสนิท */
+    --text: #e5e5e5;         /* ตัวอักษรขาวนวล */
+    --box: #161616;          /* พื้นหลังกล่อง/การ์ด */
+    --border: #3d3422;       /* สีเส้นขอบทองหม่น */
+    --gold: #c5a059;         /* สีทองหลัก */
+    --gold-bright: #f3e092;  /* สีทองสว่างสำหรับเล่นแสง */
+    
+    /* การไล่ระดับสีแบบโลหะ (Metallic Gradient) */
+    --gold-gradient: linear-gradient(135deg, #a67c00 0%, #bf953f 25%, #fcf6ba 50%, #b38728 75%, #aa771c 100%);
+    
+    /* เงาสีทองฟุ้งๆ */
+    --gold-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 8px rgba(197, 160, 89, 0.1);
 }
 
-body.dark {
-    --bg:#121212;
-    --text:#fff;
-    --box:#1e1e1e;
-    --border:#444;
-    --card:#333;
-}
-
+/* 2. การตั้งค่าพื้นฐานเพื่อให้เว็บดูแพง */
 body {
-    margin:0;
-    padding:15px;
-    font-family:sans-serif;
-    background:var(--bg);
-    color:var(--text);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif; /* แนะนำใช้ฟอนต์ดูสะอาดตา */
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
 }
 
-#topBar {
-    position:relative;
-    display:flex;
-    justify-content:center;
-    margin-bottom:10px;
+/* 3. ตัวอย่างการใช้กับการ์ด (Luxury Card) */
+.card {
+    background-color: var(--box);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    box-shadow: var(--gold-shadow);
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-#clockBox {
-    font-size:40px;
-    font-weight:bold;
-    padding:10px 20px;
-    border:3px solid var(--border);
-    border-radius:12px;
-    text-align:center;
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold); /* ขอบสว่างขึ้นเมื่อชี้ */
 }
 
-#themeBtn {
-    position:absolute;
-    right:10px;
-    top:10px;
-    width:28px;
-    height:28px;
-    border-radius:6px;
-    border:1px solid var(--border);
-    cursor:pointer;
+/* 4. หัวข้อสีทองเหลือบ (Golden Text Gradient) */
+h1, .gold-text {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
-body:not(.dark) #themeBtn { background:#fff; color:#000; }
-body.dark #themeBtn { background:#000; color:#fff; }
-
-.main { display:flex; gap:15px; }
-
-.left-panel {
-    width:230px;
-    border:2px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-    background:var(--box);
+/* 5. ปุ่มทองหรู */
+.btn-gold {
+    background: var(--gold-gradient);
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.3s;
 }
 
-.right-panel { flex:1; }
-
-.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
-
-.box {
-    flex:1;
-    min-width:320px;
-    border:2px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-    background:var(--box);
-}
-
-.table-header {
-    display:flex;
-    font-weight:bold;
-    font-size:12px;
-    padding:6px 8px;
-    border-bottom:2px solid var(--border);
-    margin-bottom:6px;
-}
-
-.table-header div { flex:1; }
-.table-header div:last-child { text-align:right; }
-
-.card.row {
-    display:flex;
-    padding:8px;
-    margin:5px;
-    border-radius:8px;
-    background:var(--card);
-}
-
-.col { flex:1; font-size:13px; }
-.col.pos { color:#4a90e2; font-weight:bold; }
-.col.name { font-weight:bold; }
-.col.time { text-align:right; font-family:monospace; }
-
-select, button {
-    width:100%;
-    margin-top:5px;
-    padding:5px;
-    font-size:14px;
-}
-
-#status {
-    margin-top:10px;
-    font-size:14px;
-    color:#4a90e2;
-}
+.btn-gold:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
 </style>
 </head>
 
