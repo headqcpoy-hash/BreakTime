@@ -6,7 +6,9 @@
 
 <style>
 
-/* ===== THEME GOLD / DARK ===== */
+/* =======================
+   🌟 LIGHT MODE (GOLD LUXURY)
+======================= */
 :root {
     --bg: linear-gradient(135deg, #fff8dc, #f7e7b3);
     --text: #3b2f00;
@@ -15,24 +17,32 @@
     --card: linear-gradient(135deg, #fff3b0, #ffe08a);
 }
 
+/* =======================
+   🌑 DARK MODE (PREMIUM BLACK GRADIENT)
+======================= */
 body.dark {
-    --bg: #000000;
+    --bg: linear-gradient(135deg, #000000 0%, #0b0b0b 40%, #1a1a1a 100%);
     --text: #ffffff;
-    --box: #000000;
-    --border: #000000;
-    --card: #000000;
+    --box: #0d0d0d;
+    --border: #2f2f2f;
+    --card: linear-gradient(135deg, #111111, #1b1b1b);
 }
 
-/* ===== BASE ===== */
+/* =======================
+   BASE
+======================= */
 body {
     margin:0;
     padding:15px;
     font-family:sans-serif;
     background:var(--bg);
     color:var(--text);
+    transition:0.3s;
 }
 
-/* ===== TOP BAR ===== */
+/* =======================
+   TOP BAR
+======================= */
 #topBar {
     position:relative;
     display:flex;
@@ -47,20 +57,23 @@ body {
     border:3px solid var(--border);
     border-radius:12px;
     text-align:center;
-    background:rgba(255,255,255,0.4);
+    background:rgba(255,255,255,0.35);
 }
 
 body.dark #clockBox {
-    background:#000;
+    background:linear-gradient(135deg,#0a0a0a,#151515);
+    border:2px solid #2f2f2f;
 }
 
-/* ===== THEME BTN ===== */
+/* =======================
+   THEME BUTTON
+======================= */
 #themeBtn {
     position:absolute;
     right:10px;
     top:10px;
-    width:28px;
-    height:28px;
+    width:30px;
+    height:30px;
     border-radius:6px;
     border:1px solid var(--border);
     cursor:pointer;
@@ -72,7 +85,9 @@ body.dark #themeBtn {
     color:#fff;
 }
 
-/* ===== LAYOUT ===== */
+/* =======================
+   LAYOUT
+======================= */
 .main { display:flex; gap:15px; }
 
 .left-panel {
@@ -85,9 +100,15 @@ body.dark #themeBtn {
 
 .right-panel { flex:1; }
 
-.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
+.wrapper {
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
 
-/* ===== BOX ===== */
+/* =======================
+   BOX
+======================= */
 .box {
     flex:1;
     min-width:320px;
@@ -98,11 +119,19 @@ body.dark #themeBtn {
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-body.dark .box {
-    box-shadow:none;
+/* DARK BOX PREMIUM LOOK */
+body.dark .box,
+body.dark .left-panel {
+    background:var(--box);
+    border:2px solid var(--border);
+    box-shadow:
+        0 0 0 1px #000,
+        0 8px 25px rgba(0,0,0,0.7);
 }
 
-/* ===== HEADER ===== */
+/* =======================
+   HEADER
+======================= */
 .table-header {
     display:flex;
     font-weight:bold;
@@ -112,10 +141,16 @@ body.dark .box {
     margin-bottom:6px;
 }
 
+body.dark .table-header {
+    border-bottom:2px solid #3a3a3a;
+}
+
 .table-header div { flex:1; }
 .table-header div:last-child { text-align:right; }
 
-/* ===== ROW ===== */
+/* =======================
+   CARD ROW
+======================= */
 .card.row {
     display:flex;
     padding:8px;
@@ -124,12 +159,33 @@ body.dark .box {
     background:var(--card);
 }
 
-.col { flex:1; font-size:13px; }
-.col.pos { color:#b8860b; font-weight:bold; }
-.col.name { font-weight:bold; }
-.col.time { text-align:right; font-family:monospace; }
+/* DARK ROW STYLE */
+body.dark .card.row {
+    background:linear-gradient(135deg,#121212,#1e1e1e);
+    border:1px solid #2a2a2a;
+}
 
-/* ===== FORM ===== */
+.col { flex:1; font-size:13px; }
+
+.col.pos {
+    font-weight:bold;
+    color:#b8860b;
+}
+
+body.dark .col.pos {
+    color:#f5d06f;
+}
+
+.col.name { font-weight:bold; }
+
+.col.time {
+    text-align:right;
+    font-family:monospace;
+}
+
+/* =======================
+   FORM
+======================= */
 select, button {
     width:100%;
     margin-top:5px;
@@ -141,6 +197,21 @@ select, button {
     margin-top:10px;
     font-size:14px;
     color:#b8860b;
+}
+
+/* =======================
+   SMALL ANIMATION TOUCH
+======================= */
+.box {
+    transition:0.2s;
+}
+
+.box:hover {
+    transform:translateY(-2px);
+}
+
+body.dark .box:hover {
+    transform:translateY(-1px);
 }
 
 </style>
