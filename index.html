@@ -5,22 +5,25 @@
 <title>Break Dashboard</title>
 
 <style>
+
+/* ===== THEME GOLD / DARK ===== */
 :root {
-    --bg:#fff;
-    --text:#000;
-    --box:#fff;
-    --border:#ccc;
-    --card:#ffe6a7;
+    --bg: linear-gradient(135deg, #fff8dc, #f7e7b3);
+    --text: #3b2f00;
+    --box: #fffaf0;
+    --border: #d4af37;
+    --card: linear-gradient(135deg, #fff3b0, #ffe08a);
 }
 
 body.dark {
-    --bg:#121212;
-    --text:#fff;
-    --box:#1e1e1e;
-    --border:#444;
-    --card:#333;
+    --bg: #000000;
+    --text: #ffffff;
+    --box: #000000;
+    --border: #000000;
+    --card: #000000;
 }
 
+/* ===== BASE ===== */
 body {
     margin:0;
     padding:15px;
@@ -29,6 +32,7 @@ body {
     color:var(--text);
 }
 
+/* ===== TOP BAR ===== */
 #topBar {
     position:relative;
     display:flex;
@@ -43,8 +47,14 @@ body {
     border:3px solid var(--border);
     border-radius:12px;
     text-align:center;
+    background:rgba(255,255,255,0.4);
 }
 
+body.dark #clockBox {
+    background:#000;
+}
+
+/* ===== THEME BTN ===== */
 #themeBtn {
     position:absolute;
     right:10px;
@@ -54,11 +64,15 @@ body {
     border-radius:6px;
     border:1px solid var(--border);
     cursor:pointer;
+    background:#fff3b0;
 }
 
-body:not(.dark) #themeBtn { background:#fff; color:#000; }
-body.dark #themeBtn { background:#000; color:#fff; }
+body.dark #themeBtn {
+    background:#000;
+    color:#fff;
+}
 
+/* ===== LAYOUT ===== */
 .main { display:flex; gap:15px; }
 
 .left-panel {
@@ -73,6 +87,7 @@ body.dark #themeBtn { background:#000; color:#fff; }
 
 .wrapper { display:flex; gap:15px; flex-wrap:wrap; }
 
+/* ===== BOX ===== */
 .box {
     flex:1;
     min-width:320px;
@@ -80,8 +95,14 @@ body.dark #themeBtn { background:#000; color:#fff; }
     border-radius:10px;
     padding:10px;
     background:var(--box);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+body.dark .box {
+    box-shadow:none;
+}
+
+/* ===== HEADER ===== */
 .table-header {
     display:flex;
     font-weight:bold;
@@ -94,6 +115,7 @@ body.dark #themeBtn { background:#000; color:#fff; }
 .table-header div { flex:1; }
 .table-header div:last-child { text-align:right; }
 
+/* ===== ROW ===== */
 .card.row {
     display:flex;
     padding:8px;
@@ -103,10 +125,11 @@ body.dark #themeBtn { background:#000; color:#fff; }
 }
 
 .col { flex:1; font-size:13px; }
-.col.pos { color:#4a90e2; font-weight:bold; }
+.col.pos { color:#b8860b; font-weight:bold; }
 .col.name { font-weight:bold; }
 .col.time { text-align:right; font-family:monospace; }
 
+/* ===== FORM ===== */
 select, button {
     width:100%;
     margin-top:5px;
@@ -117,8 +140,9 @@ select, button {
 #status {
     margin-top:10px;
     font-size:14px;
-    color:#4a90e2;
+    color:#b8860b;
 }
+
 </style>
 </head>
 
@@ -279,11 +303,10 @@ function pos(n){
     return "-";
 }
 
-/* RENDER BREAK */
+/* RENDER */
 function render(){
     let b=document.getElementById("breakBox");
     b.innerHTML="";
-
     Object.keys(status).forEach(n=>{
         b.innerHTML+=`
         <div class="card row">
@@ -294,11 +317,9 @@ function render(){
     });
 }
 
-/* RENDER TOTAL */
 function renderTotal(){
     let b=document.getElementById("totalBox");
     b.innerHTML="";
-
     Object.keys(total).forEach(n=>{
         b.innerHTML+=`
         <div class="card row">
@@ -309,7 +330,6 @@ function renderTotal(){
     });
 }
 
-/* LOOP */
 setInterval(()=>{
     render();
     renderTotal();
