@@ -6,74 +6,62 @@
 
 <style>
 :root {
-    --bg: #0a0a0a;           /* พื้นหลังดำสนิท */
-    --text: #e5e5e5;         /* ตัวอักษรขาวนวล */
-    --box: #161616;          /* พื้นหลังกล่อง/การ์ด */
-    --border: #3d3422;       /* สีเส้นขอบทองหม่น */
-    --gold: #c5a059;         /* สีทองหลัก */
-    --gold-bright: #f3e092;  /* สีทองสว่างสำหรับเล่นแสง */
+    --bg: #fdfdfd;          
+    --text: #2c2c2c;        
+    --box: #ffffff;        
+    --border: #e0d5ba;     
+    --card: #faf7f0;       
     
-    /* การไล่ระดับสีแบบโลหะ (Metallic Gradient) */
-    --gold-gradient: linear-gradient(135deg, #a67c00 0%, #bf953f 25%, #fcf6ba 50%, #b38728 75%, #aa771c 100%);
-    
-    /* เงาสีทองฟุ้งๆ */
-    --gold-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 8px rgba(197, 160, 89, 0.1);
+  
+    --gold-main: #b8860b;
+    --gold-gradient: linear-gradient(135deg, #bd9333 0%, #f3e092 50%, #8e6d28 100%);
+    --gold-shadow: 0 10px 30px rgba(184, 134, 11, 0.1);
 }
 
-/* 2. การตั้งค่าพื้นฐานเพื่อให้เว็บดูแพง */
+
+[data-theme="dark"] {
+    --bg: #0a0a0a;
+    --text: #f4f4f4;
+    --box: #161616;
+    --border: #4a3f28;
+    --card: #1c1c1c;
+    
+    --gold-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+
 body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif; /* แนะนำใช้ฟอนต์ดูสะอาดตา */
-    line-height: 1.6;
-    margin: 0;
-    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
 }
 
-/* 3. ตัวอย่างการใช้กับการ์ด (Luxury Card) */
-.card {
-    background-color: var(--box);
+.luxury-card {
+    background-color: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    max-width: 400px;
+    padding: 2rem;
+    border-radius: 15px;
     box-shadow: var(--gold-shadow);
-    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    border-color: var(--gold); /* ขอบสว่างขึ้นเมื่อชี้ */
-}
-
-/* 4. หัวข้อสีทองเหลือบ (Golden Text Gradient) */
-h1, .gold-text {
+.gold-heading {
     background: var(--gold-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    display: inline-block;
-    font-weight: bold;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-weight: 800;
 }
 
-/* 5. ปุ่มทองหรู */
-.btn-gold {
+.btn-luxury {
     background: var(--gold-gradient);
-    color: #000;
+    color: #fff;
     border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    padding: 10px 25px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: opacity 0.3s;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(189, 147, 51, 0.3);
 }
-
-.btn-gold:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
 </style>
 </head>
 
