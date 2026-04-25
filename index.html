@@ -7,32 +7,25 @@
 <style>
 
 /* =========================
-   🌟 LIGHT (GOLD DEPTH)
+   🌟 THEME (GOLD / DARK DEPTH)
 ========================= */
 :root {
     --bg:
         radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(255,215,120,0.3), transparent 40%),
         linear-gradient(135deg, #fff8dc 0%, #f5d27a 50%, #e0b84f 100%);
 
     --text:#3b2f00;
-
     --box: linear-gradient(145deg, #ffffff, #f3e2b0);
     --card: linear-gradient(145deg, #fff8d6, #ffd86b);
     --border:#d4af37;
 }
 
-/* =========================
-   DARK MODE
-========================= */
 body.dark {
     --bg:
         radial-gradient(circle at 15% 20%, rgba(255,255,255,0.05), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 40%),
         linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #1a1a1a 100%);
 
     --text:#ffffff;
-
     --box: linear-gradient(145deg, #0a0a0a, #1a1a1a);
     --card: linear-gradient(145deg, #121212, #1f1f1f);
     --border:#2a2a2a;
@@ -52,25 +45,14 @@ body {
 /* =========================
    TOP
 ========================= */
-#topBar {
-    display:flex;
-    justify-content:center;
-    position:relative;
+#clockBox {
+    font-size:54px;
+    text-align:center;
     margin-bottom:10px;
 }
 
-#clockBox {
-    font-size:54px;
-    padding:10px 20px;
-    border-radius:14px;
-    text-align:center;
-
-    background:linear-gradient(145deg,#fff,#ffe9a3);
-    border:2px solid #d4af37;
-}
-
 /* =========================
-   LAYOUT (FIXED)
+   LAYOUT
 ========================= */
 .main {
     display:flex;
@@ -78,13 +60,22 @@ body {
     height:calc(100vh - 120px);
 }
 
-/* LEFT = compact */
+/* LEFT = GRID 3x3 */
 .left-panel {
-    width:260px;
-    align-self:flex-start; /* ไม่ยืดเต็ม */
+    width:320px;
+    padding:12px;
+    border-radius:14px;
+    background:var(--box);
+    border:1px solid var(--border);
+
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-gap:10px;
+
+    align-content:start;
 }
 
-/* RIGHT = BIG DASHBOARD */
+/* RIGHT DASHBOARD */
 .right-panel {
     flex:1;
 }
@@ -92,97 +83,57 @@ body {
 .wrapper {
     display:flex;
     gap:20px;
-    height:100%;
 }
 
 /* =========================
-   BOX
+   GRID BOX (LEFT)
+========================= */
+.grid-box {
+    padding:10px;
+    border-radius:10px;
+    background:var(--card);
+    text-align:center;
+    font-size:13px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* make select full */
+.grid-box select,
+.grid-box button {
+    width:100%;
+    padding:6px;
+    font-size:12px;
+}
+
+/* status full width */
+.status-box {
+    grid-column: span 3;
+    text-align:center;
+    font-size:12px;
+}
+
+/* =========================
+   RIGHT BOX
 ========================= */
 .box {
     flex:1;
-    min-width:480px;   /* 👈 ทำให้ dashboard ใหญ่ */
+    min-width:480px;
     padding:15px;
     border-radius:14px;
-
     background:var(--box);
-    border:1px solid var(--border);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.4),
-        inset 0 -2px 4px rgba(0,0,0,0.2),
-        0 10px 30px rgba(0,0,0,0.2);
 }
 
-/* =========================
-   LEFT BOX (COMPACT FIX)
-========================= */
-.left-panel {
-    padding:12px;
-    border-radius:14px;
-
-    background:var(--box);
-    border:1px solid var(--border);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.4),
-        0 8px 20px rgba(0,0,0,0.15);
-}
-
-/* =========================
-   DASHBOARD TITLE BIG
-========================= */
-h3 {
-    font-size:20px;
-    margin:5px 0 10px;
-}
-
-/* =========================
-   TABLE HEADER
-========================= */
-.table-header {
-    display:flex;
-    font-weight:bold;
-    font-size:13px;
-    margin-bottom:8px;
-}
-
-.table-header div { flex:1; }
-
-/* =========================
-   ROW
-========================= */
+/* ROW */
 .row {
     display:flex;
-    padding:8px;
-    margin:5px 0;
-    border-radius:10px;
+    justify-content:space-between;
+    padding:6px;
+    margin:4px 0;
     background:var(--card);
-}
-
-/* =========================
-   FORM (COMPACT LEFT)
-========================= */
-select, button {
-    width:100%;
-    padding:8px;
-    font-size:14px;
-    margin-top:6px;
-}
-
-button:disabled {
-    opacity:0.4;
-    cursor:not-allowed;
-}
-
-/* =========================
-   TEXT
-========================= */
-.pos { color:#b8860b; font-weight:bold; }
-body.dark .pos { color:#f5d06f; }
-
-#status {
-    margin-top:8px;
-    font-size:13px;
+    border-radius:8px;
 }
 
 </style>
@@ -190,17 +141,14 @@ body.dark .pos { color:#f5d06f; }
 
 <body>
 
-<div id="topBar">
-    <div id="clockBox">🕒</div>
-</div>
+<div id="clockBox">🕒</div>
 
 <div class="main">
 
-<!-- LEFT (COMPACT) -->
+<!-- LEFT 3x3 GRID -->
 <div class="left-panel">
 
-<h3>☕ ลงเวลา</h3>
-
+<div class="grid-box">
 <select id="positionSelect" onchange="updateNames(); validateForm();">
 <option value="">ตำแหน่ง</option>
 <option>Head</option>
@@ -213,40 +161,39 @@ body.dark .pos { color:#f5d06f; }
 <option>AD-BO</option>
 <option>AD-STM</option>
 </select>
+</div>
 
+<div class="grid-box">
 <select id="nameSelect" onchange="validateForm()">
 <option value="">ชื่อ</option>
 </select>
+</div>
 
-<button id="startBtn" onclick="startBreak()" disabled>พัก ☕</button>
-<button id="endBtn" onclick="endBreak()" disabled>กลับ 💻</button>
+<div class="grid-box">
+<button id="startBtn" onclick="startBreak()" disabled>พัก</button>
+</div>
 
-<div id="status">กรุณาเลือกข้อมูล</div>
+<div class="grid-box">
+<button id="endBtn" onclick="endBreak()" disabled>กลับ</button>
+</div>
+
+<div class="grid-box status-box" id="status">
+กรุณาเลือกข้อมูล
+</div>
 
 </div>
 
-<!-- RIGHT (BIG DASHBOARD) -->
+<!-- RIGHT -->
 <div class="right-panel">
-
 <div class="wrapper">
 
 <div class="box">
 <h3>⏳ กำลังพัก</h3>
-<div class="table-header">
-<div>ตำแหน่ง</div>
-<div>ชื่อ</div>
-<div>เวลา</div>
-</div>
 <div id="breakBox"></div>
 </div>
 
 <div class="box">
 <h3>🧮 เวลาสะสม</h3>
-<div class="table-header">
-<div>ตำแหน่ง</div>
-<div>ชื่อ</div>
-<div>เวลา</div>
-</div>
 <div id="totalBox"></div>
 </div>
 
@@ -257,74 +204,50 @@ body.dark .pos { color:#f5d06f; }
 
 <script>
 
-/* DATA (เต็ม) */
+/* DATA */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
-"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-"QC-SV":["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
-"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
-"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-"QC-MKT":["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
-"QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่","นิ"],
-"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
+"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"]
 };
 
 let status = {};
 let total = {};
 
 /* CLOCK */
-function clock(){
+setInterval(()=>{
     const n=new Date();
-    const hh=String(n.getHours()).padStart(2,'0');
-    const mm=String(n.getMinutes()).padStart(2,'0');
-    const ss=String(n.getSeconds()).padStart(2,'0');
-    document.getElementById("clockBox").innerHTML = `🕒 ${hh}:${mm}:${ss}`;
-}
-setInterval(clock,1000);
-
-/* THEME */
-function toggleTheme(){
-    document.body.classList.toggle("dark");
-}
+    clockBox.innerText = `🕒 ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+},1000);
 
 /* VALIDATE */
 function validateForm(){
-    let p=positionSelect.value;
-    let n=nameSelect.value;
-
-    let ok = p && n;
-
+    let ok = positionSelect.value && nameSelect.value;
     startBtn.disabled = !ok;
     endBtn.disabled = !ok;
-
-    status.innerText = ok ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
+    status.innerText = ok ? "พร้อมใช้งาน" : "กรุณาเลือกข้อมูล";
 }
 
-/* NAME */
+/* UPDATE NAME */
 function updateNames(){
-    let p=positionSelect.value;
     nameSelect.innerHTML="<option value=''>ชื่อ</option>";
-
-    (data[p]||[]).forEach(n=>{
+    (data[positionSelect.value]||[]).forEach(n=>{
         let o=document.createElement("option");
-        o.text=n;
         o.value=n;
+        o.text=n;
         nameSelect.appendChild(o);
     });
 }
 
-/* START / END */
+/* START */
 function startBreak(){
     let n=nameSelect.value;
     if(!n) return;
     status[n]=Date.now();
 }
 
+/* END */
 function endBreak(){
     let n=nameSelect.value;
-    if(!n) return;
-
     if(status[n]){
         let sec=(Date.now()-status[n])/1000;
         total[n]=(total[n]||0)+sec;
@@ -335,17 +258,7 @@ function endBreak(){
 /* FORMAT */
 function f(ms){
     let s=Math.floor(ms/1000);
-    let m=String(Math.floor(s/60)).padStart(2,'0');
-    let r=String(s%60).padStart(2,'0');
-    return `${m}:${r}`;
-}
-
-/* POSITION */
-function pos(n){
-    for(let p in data){
-        if(data[p].includes(n)) return p;
-    }
-    return "-";
+    return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
 
 /* RENDER */
@@ -354,7 +267,6 @@ function render(){
     Object.keys(status).forEach(n=>{
         breakBox.innerHTML+=`
         <div class="row">
-            <div class="pos">${pos(n)}</div>
             <div>${n}</div>
             <div>${f(Date.now()-status[n])}</div>
         </div>`;
@@ -366,7 +278,6 @@ function renderTotal(){
     Object.keys(total).forEach(n=>{
         totalBox.innerHTML+=`
         <div class="row">
-            <div class="pos">${pos(n)}</div>
             <div>${n}</div>
             <div>${f(total[n]*1000)}</div>
         </div>`;
