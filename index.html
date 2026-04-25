@@ -6,43 +6,54 @@
 
 <style>
 
-/* =======================
-   🌟 LIGHT MODE (GOLD LUXURY)
-======================= */
+/* =========================
+   🌟 LIGHT MODE (REAL GOLD DEPTH)
+========================= */
 :root {
-    --bg: linear-gradient(135deg, #fff8dc, #f7e7b3);
-    --text: #3b2f00;
-    --box: #fffaf0;
-    --border: #d4af37;
-    --card: linear-gradient(135deg, #fff3b0, #ffe08a);
+    --bg:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255,215,120,0.3), transparent 40%),
+        linear-gradient(135deg, #fff8dc 0%, #f5d27a 50%, #e0b84f 100%);
+
+    --text:#3b2f00;
+
+    --box: linear-gradient(145deg, #ffffff, #f3e2b0);
+    --card: linear-gradient(145deg, #fff8d6, #ffd86b);
+
+    --border:#d4af37;
 }
 
-/* =======================
-   🌑 DARK MODE (PREMIUM BLACK GRADIENT)
-======================= */
+/* =========================
+   🌑 DARK MODE (DEPTH REAL)
+========================= */
 body.dark {
-    --bg: linear-gradient(135deg, #000000 0%, #0b0b0b 40%, #1a1a1a 100%);
-    --text: #ffffff;
-    --box: #0d0d0d;
-    --border: #2f2f2f;
-    --card: linear-gradient(135deg, #111111, #1b1b1b);
+    --bg:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.05), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 40%),
+        linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #1a1a1a 100%);
+
+    --text:#ffffff;
+
+    --box: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+    --card: linear-gradient(145deg, #121212, #1f1f1f);
+
+    --border:#2a2a2a;
 }
 
-/* =======================
+/* =========================
    BASE
-======================= */
+========================= */
 body {
     margin:0;
     padding:15px;
     font-family:sans-serif;
     background:var(--bg);
     color:var(--text);
-    transition:0.3s;
 }
 
-/* =======================
+/* =========================
    TOP BAR
-======================= */
+========================= */
 #topBar {
     position:relative;
     display:flex;
@@ -54,20 +65,28 @@ body {
     font-size:40px;
     font-weight:bold;
     padding:10px 20px;
-    border:3px solid var(--border);
-    border-radius:12px;
+    border-radius:14px;
     text-align:center;
-    background:rgba(255,255,255,0.35);
+
+    background:linear-gradient(145deg,#ffffff,#ffe9a3);
+    border:2px solid #d4af37;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        0 6px 20px rgba(212,175,55,0.3);
 }
 
 body.dark #clockBox {
-    background:linear-gradient(135deg,#0a0a0a,#151515);
-    border:2px solid #2f2f2f;
+    background:linear-gradient(145deg,#0a0a0a,#1a1a1a);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 8px 25px rgba(0,0,0,0.9);
 }
 
-/* =======================
-   THEME BUTTON
-======================= */
+/* =========================
+   THEME BTN
+========================= */
 #themeBtn {
     position:absolute;
     right:10px;
@@ -77,94 +96,100 @@ body.dark #clockBox {
     border-radius:6px;
     border:1px solid var(--border);
     cursor:pointer;
-    background:#fff3b0;
 }
 
-body.dark #themeBtn {
-    background:#000;
-    color:#fff;
-}
-
-/* =======================
+/* =========================
    LAYOUT
-======================= */
+========================= */
 .main { display:flex; gap:15px; }
 
 .left-panel {
     width:230px;
-    border:2px solid var(--border);
-    border-radius:10px;
-    padding:10px;
-    background:var(--box);
 }
 
 .right-panel { flex:1; }
 
-.wrapper {
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-}
+.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
 
-/* =======================
-   BOX
-======================= */
-.box {
-    flex:1;
-    min-width:320px;
-    border:2px solid var(--border);
-    border-radius:10px;
+/* =========================
+   BOX (REAL DEPTH)
+========================= */
+.box, .left-panel {
     padding:10px;
+    border-radius:14px;
     background:var(--box);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border:1px solid var(--border);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.2),
+        0 8px 25px rgba(0,0,0,0.2);
+
+    transition:0.25s;
 }
 
-/* DARK BOX PREMIUM LOOK */
 body.dark .box,
 body.dark .left-panel {
-    background:var(--box);
-    border:2px solid var(--border);
     box-shadow:
-        0 0 0 1px #000,
-        0 8px 25px rgba(0,0,0,0.7);
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        inset 0 -3px 6px rgba(0,0,0,0.8),
+        0 10px 30px rgba(0,0,0,0.9);
 }
 
-/* =======================
+.box:hover {
+    transform:translateY(-3px);
+}
+
+/* =========================
    HEADER
-======================= */
+========================= */
 .table-header {
     display:flex;
     font-weight:bold;
     font-size:12px;
     padding:6px 8px;
-    border-bottom:2px solid var(--border);
     margin-bottom:6px;
-}
 
-body.dark .table-header {
-    border-bottom:2px solid #3a3a3a;
+    border-bottom:2px solid transparent;
+
+    background:
+        linear-gradient(var(--box), var(--box)) padding-box,
+        linear-gradient(90deg, #d4af37, #fff2a6, #d4af37) border-box;
 }
 
 .table-header div { flex:1; }
 .table-header div:last-child { text-align:right; }
 
-/* =======================
-   CARD ROW
-======================= */
+/* =========================
+   CARD
+========================= */
 .card.row {
     display:flex;
     padding:8px;
     margin:5px;
-    border-radius:8px;
+    border-radius:10px;
     background:var(--card);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        0 4px 10px rgba(0,0,0,0.15);
+
+    transition:0.2s;
 }
 
-/* DARK ROW STYLE */
 body.dark .card.row {
-    background:linear-gradient(135deg,#121212,#1e1e1e);
-    border:1px solid #2a2a2a;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 6px 18px rgba(0,0,0,0.8);
 }
 
+.card.row:hover {
+    transform:translateY(-2px);
+}
+
+/* =========================
+   TEXT
+========================= */
 .col { flex:1; font-size:13px; }
 
 .col.pos {
@@ -183,9 +208,9 @@ body.dark .col.pos {
     font-family:monospace;
 }
 
-/* =======================
+/* =========================
    FORM
-======================= */
+========================= */
 select, button {
     width:100%;
     margin-top:5px;
@@ -195,23 +220,7 @@ select, button {
 
 #status {
     margin-top:10px;
-    font-size:14px;
     color:#b8860b;
-}
-
-/* =======================
-   SMALL ANIMATION TOUCH
-======================= */
-.box {
-    transition:0.2s;
-}
-
-.box:hover {
-    transform:translateY(-2px);
-}
-
-body.dark .box:hover {
-    transform:translateY(-1px);
 }
 
 </style>
@@ -226,58 +235,53 @@ body.dark .box:hover {
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left-panel">
-
 <h4>☕ ลงเวลา</h4>
 
 <select id="positionSelect" onchange="updateNames()">
-    <option value="">ตำแหน่ง</option>
-    <option>Head</option>
-    <option>QC-SA</option>
-    <option>QC-SV</option>
-    <option>QC-PR</option>
-    <option>QC-AI</option>
-    <option>QC-MKT</option>
-    <option>QC-Support</option>
-    <option>AD-BO</option>
-    <option>AD-STM</option>
+<option value="">ตำแหน่ง</option>
+<option>Head</option>
+<option>QC-SA</option>
+<option>QC-SV</option>
+<option>QC-PR</option>
+<option>QC-AI</option>
+<option>QC-MKT</option>
+<option>QC-Support</option>
+<option>AD-BO</option>
+<option>AD-STM</option>
 </select>
 
 <select id="nameSelect">
-    <option>ชื่อ</option>
+<option>ชื่อ</option>
 </select>
 
 <button onclick="startBreak()">พัก ☕</button>
 <button onclick="endBreak()">กลับ 💻</button>
 
 <div id="status">-</div>
-
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
-
 <div class="wrapper">
 
 <div class="box">
-    <h3>⏳ กำลังพัก</h3>
-    <div class="table-header">
-        <div>ตำแหน่ง</div>
-        <div>ชื่อ</div>
-        <div>ระยะเวลา</div>
-    </div>
-    <div id="breakBox"></div>
+<h3>⏳ กำลังพัก</h3>
+<div class="table-header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>ระยะเวลา</div>
+</div>
+<div id="breakBox"></div>
 </div>
 
 <div class="box">
-    <h3>🧮 เวลาสะสม</h3>
-    <div class="table-header">
-        <div>ตำแหน่ง</div>
-        <div>ชื่อ</div>
-        <div>ระยะเวลา</div>
-    </div>
-    <div id="totalBox"></div>
+<h3>🧮 เวลาสะสม</h3>
+<div class="table-header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>ระยะเวลา</div>
+</div>
+<div id="totalBox"></div>
 </div>
 
 </div>
@@ -302,7 +306,6 @@ const data = {
 let status = {};
 let total = {};
 
-/* CLOCK */
 function clock(){
     const n=new Date();
     const d=String(n.getDate()).padStart(2,'0');
@@ -319,18 +322,14 @@ function clock(){
 setInterval(clock,1000);
 clock();
 
-/* THEME */
 function toggleTheme(){
     document.body.classList.toggle("dark");
 }
 
-/* NAME */
 function updateNames(){
     let p=document.getElementById("positionSelect").value;
     let s=document.getElementById("nameSelect");
-
     s.innerHTML="<option>ชื่อ</option>";
-
     (data[p]||[]).forEach(n=>{
         let o=document.createElement("option");
         o.text=n;
@@ -339,18 +338,15 @@ function updateNames(){
     });
 }
 
-/* START */
 function startBreak(){
     let n=document.getElementById("nameSelect").value;
     if(!n) return alert("เลือกชื่อ");
     status[n]=Date.now();
 }
 
-/* END */
 function endBreak(){
     let n=document.getElementById("nameSelect").value;
     if(!n) return;
-
     if(status[n]){
         let sec=(Date.now()-status[n])/1000;
         total[n]=(total[n]||0)+sec;
@@ -358,7 +354,6 @@ function endBreak(){
     }
 }
 
-/* FORMAT */
 function f(ms){
     let s=Math.floor(ms/1000);
     let m=String(Math.floor(s/60)).padStart(2,'0');
@@ -366,7 +361,6 @@ function f(ms){
     return `${m}:${r}`;
 }
 
-/* POSITION */
 function pos(n){
     for(let p in data){
         if(data[p].includes(n)) return p;
@@ -374,7 +368,6 @@ function pos(n){
     return "-";
 }
 
-/* RENDER */
 function render(){
     let b=document.getElementById("breakBox");
     b.innerHTML="";
