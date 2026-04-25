@@ -52,7 +52,11 @@ body {
     padding:8px;
 }
 
-.header { font-weight:bold; border-bottom:1px solid var(--border); }
+.header {
+    font-weight:bold;
+    border-bottom:1px solid var(--border);
+}
+
 .header div, .row div { flex:1; }
 
 .row {
@@ -82,6 +86,7 @@ button:disabled { opacity:0.3; }
 
 <div class="main">
 
+<!-- LEFT -->
 <div class="left-panel">
 
 <h3>☕ CONTROL</h3>
@@ -103,7 +108,6 @@ button:disabled { opacity:0.3; }
 <option value="">ชื่อ</option>
 </select>
 
-<!-- ✅ เพิ่มใหม่ -->
 <select id="typeSelect" onchange="validateForm()">
 <option value="">ประเภทธุระ</option>
 <option>พักกินข้าว</option>
@@ -119,27 +123,35 @@ button:disabled { opacity:0.3; }
 
 </div>
 
+<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
+<!-- ACTIVE -->
 <div class="box">
 <h3>⏳ ACTIVE BREAK</h3>
+
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
 </div>
+
 <div id="breakBox"></div>
 </div>
 
+<!-- TOTAL -->
 <div class="box">
 <h3>🧮 TOTAL TIME</h3>
+
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
+<div>TYPE</div>
 <div>TIME</div>
 </div>
+
 <div id="totalBox"></div>
 </div>
 
@@ -150,6 +162,7 @@ button:disabled { opacity:0.3; }
 
 <script>
 
+/* DATA */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -162,11 +175,8 @@ const data = {
 "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
-let status = {};   // start time
-let total = {};    // total time
-
-/* type เก็บคู่ key = name+type */
-let active = {};
+let active = {};  // current
+let total = {};   // accumulated
 
 /* CLOCK */
 setInterval(()=>{
@@ -183,7 +193,7 @@ function validateForm(){
     status.innerText = ok ? "READY" : "SELECT DATA";
 }
 
-/* NAME */
+/* NAME LIST */
 function updateNames(){
     nameSelect.innerHTML="<option value=''>ชื่อ</option>";
     (data[positionSelect.value]||[]).forEach(n=>{
@@ -203,6 +213,7 @@ function key(){
 function startBreak(){
     let k = key();
     if(!k) return;
+
     active[k] = {
         name:nameSelect.value,
         type:typeSelect.value,
@@ -230,7 +241,7 @@ function f(ms){
     return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
 }
 
-/* RENDER ACTIVE */
+/* ACTIVE */
 function render(){
     breakBox.innerHTML="";
     Object.keys(active).forEach(k=>{
@@ -245,15 +256,26 @@ function render(){
     });
 }
 
-/* TOTAL */
+/* TOTAL (4 LAYERS) */
 function renderTotal(){
     totalBox.innerHTML="";
+
     Object.keys(total).forEach(k=>{
-        let a = active[k] || {name:k.split("||")[0], pos:"-"};
+        let [name,type] = k.split("||");
+
+        let pos = "-";
+        for(let p in data){
+            if(data[p].includes(name)){
+                pos = p;
+                break;
+            }
+        }
+
         totalBox.innerHTML+=`
         <div class="row">
-            <div>${a.pos}</div>
-            <div>${a.name}</div>
+            <div>${pos}</div>
+            <div>${name}</div>
+            <div>${type || "-"}</div>
             <div>${f(total[k]*1000)}</div>
         </div>`;
     });
