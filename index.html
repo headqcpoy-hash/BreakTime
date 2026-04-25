@@ -30,19 +30,11 @@ body {
     margin-bottom:10px;
 }
 
-.main {
-    display:flex;
-    gap:20px;
-    height:calc(100vh - 100px);
-}
-
+.main { display:flex; gap:20px; height:calc(100vh - 100px); }
 .left-panel { width:300px; }
 .right-panel { flex:1; }
 
-.wrapper {
-    display:flex;
-    gap:20px;
-}
+.wrapper { display:flex; gap:20px; }
 
 .box {
     flex:1;
@@ -53,19 +45,9 @@ body {
     border:1px solid var(--border);
 }
 
-.header, .row {
-    display:flex;
-    padding:8px;
-}
-
-.header {
-    font-weight:bold;
-    border-bottom:1px solid var(--border);
-}
-
-.header div, .row div {
-    flex:1;
-}
+.header, .row { display:flex; padding:8px; }
+.header { font-weight:bold; border-bottom:1px solid var(--border); }
+.header div, .row div { flex:1; }
 
 .row {
     margin:5px 0;
@@ -80,15 +62,34 @@ select, button {
     background:rgba(0,0,0,0.3);
     color:white;
     border:1px solid var(--border);
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:0.1s;
 }
 
-button:disabled {
-    opacity:0.3;
+button:active {
+    transform:scale(0.95);
+    box-shadow:0 0 15px rgba(160,80,255,0.7);
 }
 
-#status {
-    margin-top:10px;
+.ripple {
+    position:absolute;
+    border-radius:50%;
+    transform:scale(0);
+    animation:ripple 600ms linear;
+    background:rgba(255,255,255,0.35);
+    pointer-events:none;
 }
+
+@keyframes ripple {
+    to {
+        transform:scale(4);
+        opacity:0;
+    }
+}
+
+#status { margin-top:10px; }
 </style>
 </head>
 
@@ -98,9 +99,10 @@ button:disabled {
 
 <div class="main">
     <div class="left-panel">
+
         <h3>☕ CONTROL</h3>
 
-        <select id="positionSelect" onchange="updateNames(); validateForm();">
+        <select id="positionSelect">
             <option value="">ตำแหน่ง</option>
             <option>Head</option>
             <option>QC-SA</option>
@@ -113,11 +115,11 @@ button:disabled {
             <option>AD-STM</option>
         </select>
 
-        <select id="nameSelect" onchange="validateForm()">
+        <select id="nameSelect">
             <option value="">ชื่อ</option>
         </select>
 
-        <select id="typeSelect" onchange="validateForm()">
+        <select id="typeSelect">
             <option value="">ประเภทธุระ</option>
             <option>พักกินข้าว</option>
             <option>เข้าห้องน้ำ</option>
@@ -125,17 +127,19 @@ button:disabled {
             <option>เอาของ(ส่วนรวม)</option>
         </select>
 
-        <button id="startBtn" onclick="startBreak()" disabled>START</button>
-        <button id="endBtn" onclick="endBreak()" disabled>END</button>
+        <button id="startBtn">START</button>
+        <button id="endBtn">END</button>
 
         <div id="status">SYSTEM READY</div>
+
     </div>
 
     <div class="right-panel">
+
         <div class="wrapper">
 
             <div class="box">
-                <h3>⏳ ACTIVE BREAK</h3>
+                <h3>⏳ ACTIVE</h3>
                 <div class="header">
                     <div>POSITION</div>
                     <div>NAME</div>
@@ -146,7 +150,7 @@ button:disabled {
             </div>
 
             <div class="box">
-                <h3>🧮 TOTAL TIME</h3>
+                <h3>🧮 TOTAL</h3>
                 <div class="header">
                     <div>POSITION</div>
                     <div>NAME</div>
@@ -157,6 +161,7 @@ button:disabled {
             </div>
 
         </div>
+
     </div>
 </div>
 
@@ -164,15 +169,15 @@ button:disabled {
 const API_URL = "https://script.google.com/macros/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
 
 const data = {
-    "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
-    "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-    "QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
-    "QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
-    "QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-    "QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
-    "QC-Support":["เบล","อุ้ม"],
-    "AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
-    "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
+"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
+"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
+"QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
+"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
+"QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
+"QC-Support":["เบล","อุ้ม"],
+"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
+"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
 };
 
 let active = {};
@@ -180,123 +185,119 @@ let total = {};
 
 /* CLOCK */
 setInterval(()=>{
-    const n = new Date();
-    clockBox.innerText = `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
+const n = new Date();
+clockBox.innerText =
+`🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
 },1000);
 
-/* VALIDATE */
-function validateForm(){
-    let ok = positionSelect.value && nameSelect.value && typeSelect.value;
-    startBtn.disabled = !ok;
-    endBtn.disabled = !ok;
-    status.innerText = ok ? "READY" : "SELECT DATA";
-}
-
 /* NAME */
-function updateNames(){
-    nameSelect.innerHTML = "<option value=''>ชื่อ</option>";
-    (data[positionSelect.value] || []).forEach(n=>{
-        let o = document.createElement("option");
-        o.value = n;
-        o.text = n;
-        nameSelect.appendChild(o);
-    });
-}
+positionSelect.onchange = function(){
+nameSelect.innerHTML = "<option value=''>ชื่อ</option>";
+(data[this.value]||[]).forEach(n=>{
+let o=document.createElement("option");
+o.value=n; o.text=n;
+nameSelect.appendChild(o);
+});
+};
 
 /* KEY */
 function key(){
-    return `${nameSelect.value}||${typeSelect.value}`;
+return nameSelect.value+"||"+typeSelect.value;
+}
+
+/* RIPPLE */
+function ripple(e){
+const btn=e.currentTarget;
+const span=document.createElement("span");
+const size=Math.max(btn.clientWidth,btn.clientHeight);
+const rect=btn.getBoundingClientRect();
+
+span.className="ripple";
+span.style.width=span.style.height=size+"px";
+span.style.left=(e.clientX-rect.left-size/2)+"px";
+span.style.top=(e.clientY-rect.top-size/2)+"px";
+
+btn.appendChild(span);
+setTimeout(()=>span.remove(),600);
 }
 
 /* START */
-function startBreak(){
-    let k = key();
-    if(!k) return;
+startBtn.onclick=function(e){
+ripple(e);
 
-    active[k] = {
-        name: nameSelect.value,
-        type: typeSelect.value,
-        pos: positionSelect.value,
-        start: Date.now()
-    };
+const name=nameSelect.value;
+const pos=positionSelect.value;
+const type=typeSelect.value;
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-            name:nameSelect.value,
-            position:positionSelect.value,
-            type:typeSelect.value,
-            action:"START",
-            duration:0
-        })
-    });
-}
+if(!name||!pos||!type) return;
+
+const k=key();
+
+active[k]={name,pos,type,start:Date.now()};
+
+fetch(API_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name,position:pos,type,action:"START",duration:0})
+});
+};
 
 /* END */
-function endBreak(){
-    let k = key();
-    if(!active[k]) return;
+endBtn.onclick=function(e){
+ripple(e);
 
-    let sec = (Date.now() - active[k].start) / 1000;
-    total[k] = (total[k] || 0) + sec;
+const k=key();
+if(!active[k]) return;
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-            name:active[k].name,
-            position:active[k].pos,
-            type:active[k].type,
-            action:"END",
-            duration:sec
-        })
-    });
+const sec=(Date.now()-active[k].start)/1000;
+const a=active[k];
 
-    delete active[k];
-}
+total[k]=(total[k]||0)+sec;
 
-/* RENDER ACTIVE */
-function render(){
-    breakBox.innerHTML = "";
-    Object.keys(active).forEach(k=>{
-        let a = active[k];
-        breakBox.innerHTML += `
-        <div class="row">
-            <div>${a.pos}</div>
-            <div>${a.name}</div>
-            <div>${a.type}</div>
-            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
-        </div>`;
-    });
-}
+fetch(API_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:a.name,position:a.pos,type:a.type,action:"END",duration:sec})
+});
 
-/* RENDER TOTAL */
-function renderTotal(){
-    totalBox.innerHTML = "";
-    Object.keys(total).forEach(k=>{
-        let [name,type] = k.split("||");
-        let pos = "-";
+delete active[k];
+};
 
-        for(let p in data){
-            if(data[p].includes(name)) pos = p;
-        }
-
-        totalBox.innerHTML += `
-        <div class="row">
-            <div>${pos}</div>
-            <div>${name}</div>
-            <div>${type}</div>
-            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
-        </div>`;
-    });
-}
-
+/* RENDER */
 setInterval(()=>{
-    render();
-    renderTotal();
+
+breakBox.innerHTML="";
+for(let k in active){
+let a=active[k];
+breakBox.innerHTML+=`
+<div class="row">
+<div>${a.pos}</div>
+<div>${a.name}</div>
+<div>${a.type}</div>
+<div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
+</div>`;
+}
+
+totalBox.innerHTML="";
+for(let k in total){
+let [name,type]=k.split("||");
+let pos="-";
+for(let p in data){
+if(data[p].includes(name)) pos=p;
+}
+
+totalBox.innerHTML+=`
+<div class="row">
+<div>${pos}</div>
+<div>${name}</div>
+<div>${type}</div>
+<div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
+</div>`;
+}
+
 },1000);
 
 </script>
+
 </body>
 </html>
