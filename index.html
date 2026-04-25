@@ -30,19 +30,11 @@ body {
     margin-bottom:10px;
 }
 
-.main {
-    display:flex;
-    gap:20px;
-    height:calc(100vh - 100px);
-}
-
+.main { display:flex; gap:20px; height:calc(100vh - 100px); }
 .left-panel { width:300px; }
 .right-panel { flex:1; }
 
-.wrapper {
-    display:flex;
-    gap:20px;
-}
+.wrapper { display:flex; gap:20px; }
 
 .box {
     flex:1;
@@ -53,19 +45,14 @@ body {
     border:1px solid var(--border);
 }
 
-.header, .row {
-    display:flex;
-    padding:8px;
-}
+.header, .row { display:flex; padding:8px; }
 
 .header {
     font-weight:bold;
     border-bottom:1px solid var(--border);
 }
 
-.header div, .row div {
-    flex:1;
-}
+.header div, .row div { flex:1; }
 
 .row {
     margin:5px 0;
@@ -82,13 +69,9 @@ select, button {
     border:1px solid var(--border);
 }
 
-button:disabled {
-    opacity:0.3;
-}
+button:disabled { opacity:0.3; }
 
-#status {
-    margin-top:10px;
-}
+#status { margin-top:10px; }
 </style>
 </head>
 
@@ -100,7 +83,7 @@ button:disabled {
     <div class="left-panel">
         <h3>☕ CONTROL</h3>
 
-        <select id="positionSelect" onchange="updateNames(); validateForm();">
+        <select id="positionSelect">
             <option value="">ตำแหน่ง</option>
             <option>Head</option>
             <option>QC-SA</option>
@@ -113,11 +96,11 @@ button:disabled {
             <option>AD-STM</option>
         </select>
 
-        <select id="nameSelect" onchange="validateForm()">
+        <select id="nameSelect">
             <option value="">ชื่อ</option>
         </select>
 
-        <select id="typeSelect" onchange="validateForm()">
+        <select id="typeSelect">
             <option value="">ประเภทธุระ</option>
             <option>พักกินข้าว</option>
             <option>เข้าห้องน้ำ</option>
@@ -125,8 +108,8 @@ button:disabled {
             <option>เอาของ(ส่วนรวม)</option>
         </select>
 
-        <button id="startBtn" onclick="startBreak()" disabled>START</button>
-        <button id="endBtn" onclick="endBreak()" disabled>END</button>
+        <button id="startBtn">START</button>
+        <button id="endBtn">END</button>
 
         <div id="status">SYSTEM READY</div>
     </div>
@@ -161,43 +144,6 @@ button:disabled {
 </div>
 
 <script>
-async function fetchLive(){
-    try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-
-        breakBox.innerHTML = "";
-        totalBox.innerHTML = "";
-
-        data.slice(1).forEach(row => {
-            let [time, name, pos, type, action, duration] = row;
-
-            if(action === "START"){
-                breakBox.innerHTML += `
-                <div class="row">
-                    <div>${pos}</div>
-                    <div>${name}</div>
-                    <div>${type}</div>
-                    <div>LIVE</div>
-                </div>`;
-            }
-
-            if(action === "END"){
-                totalBox.innerHTML += `
-                <div class="row">
-                    <div>${pos}</div>
-                    <div>${name}</div>
-                    <div>${type}</div>
-                    <div>${Math.floor(duration/60)}:${Math.floor(duration%60).toString().padStart(2,'0')}</div>
-                </div>`;
-            }
-        });
-
-    } catch(err){
-        console.log("SYNC ERROR:", err);
-    }
-}
-    
 const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbxrhUSmBHE-tb-q1hxb4aqEvgmND1Re9BtBXOLtwucfUI-sfLDvQ4nasETWQ_dqIpy51g/exec";
 
 const data = {
@@ -218,124 +164,110 @@ let total = {};
 /* CLOCK */
 setInterval(()=>{
     const n = new Date();
-    clockBox.innerText = `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
+    document.getElementById("clockBox").innerText =
+    `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
 },1000);
 
-/* VALIDATE */
-function validateForm(){
-    let ok = positionSelect.value && nameSelect.value && typeSelect.value;
-    startBtn.disabled = !ok;
-    endBtn.disabled = !ok;
-    status.innerText = ok ? "READY" : "SELECT DATA";
-}
-
 /* NAME */
-function updateNames(){
+document.getElementById("positionSelect").addEventListener("change", function(){
+    const nameSelect = document.getElementById("nameSelect");
     nameSelect.innerHTML = "<option value=''>ชื่อ</option>";
-    (data[positionSelect.value] || []).forEach(n=>{
+
+    (data[this.value] || []).forEach(n=>{
         let o = document.createElement("option");
         o.value = n;
         o.text = n;
         nameSelect.appendChild(o);
     });
-}
+});
 
 /* KEY */
 function key(){
-    return `${nameSelect.value}||${typeSelect.value}`;
+    return document.getElementById("nameSelect").value +
+    "||" +
+    document.getElementById("typeSelect").value;
 }
 
 /* START */
-function startBreak(){
-    let k = key();
-    if(!k) return;
+document.getElementById("startBtn").onclick = function(){
+    const name = document.getElementById("nameSelect").value;
+    const pos = document.getElementById("positionSelect").value;
+    const type = document.getElementById("typeSelect").value;
 
-    active[k] = {
-        name: nameSelect.value,
-        type: typeSelect.value,
-        pos: positionSelect.value,
-        start: Date.now()
-    };
+    if(!name || !pos || !type) return;
 
-    fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            name: nameSelect.value,
-            position: positionSelect.value,
-            type: typeSelect.value,
-            action: "START",
-            duration: 0
-        })
-    })
-    .then(res => res.text())
-    .then(res => console.log("SERVER:", res))
-    .catch(err => console.log("ERROR:", err));
-}
+    const k = key();
 
-
-/* END */
-function endBreak(){
-    let k = key();
-    if(!active[k]) return;
-
-    let sec = (Date.now() - active[k].start) / 1000;
-    total[k] = (total[k] || 0) + sec;
+    active[k] = { name, pos, type, start: Date.now() };
 
     fetch(API_URL,{
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
-            name:active[k].name,
-            position:active[k].pos,
-            type:active[k].type,
+            name, position:pos, type,
+            action:"START",
+            duration:0
+        })
+    })
+    .then(r=>r.text())
+    .then(r=>console.log(r));
+};
+
+/* END */
+document.getElementById("endBtn").onclick = function(){
+    const name = document.getElementById("nameSelect").value;
+    const pos = document.getElementById("positionSelect").value;
+    const type = document.getElementById("typeSelect").value;
+
+    const k = key();
+    if(!active[k]) return;
+
+    const sec = (Date.now() - active[k].start)/1000;
+    total[k] = (total[k]||0) + sec;
+
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+            name, position:pos, type,
             action:"END",
             duration:sec
         })
     });
 
     delete active[k];
+};
+
+/* REALTIME */
+async function fetchLive(){
+    try{
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        document.getElementById("breakBox").innerHTML = "";
+        document.getElementById("totalBox").innerHTML = "";
+
+        data.slice(1).forEach(r=>{
+            let [t,n,p,ty,a,d] = r;
+
+            if(a==="START"){
+                document.getElementById("breakBox").innerHTML +=
+                `<div class="row"><div>${p}</div><div>${n}</div><div>${ty}</div><div>LIVE</div></div>`;
+            }
+
+            if(a==="END"){
+                document.getElementById("totalBox").innerHTML +=
+                `<div class="row"><div>${p}</div><div>${n}</div><div>${ty}</div><div>${Math.floor(d/60)}:${Math.floor(d%60)}</div></div>`;
+            }
+        });
+
+    } catch(e){
+        console.log(e);
+    }
 }
 
-/* RENDER ACTIVE */
-function render(){
-    breakBox.innerHTML = "";
-    Object.keys(active).forEach(k=>{
-        let a = active[k];
-        breakBox.innerHTML += `
-        <div class="row">
-            <div>${a.pos}</div>
-            <div>${a.name}</div>
-            <div>${a.type}</div>
-            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
-        </div>`;
-    });
-}
-
-/* RENDER TOTAL */
-function renderTotal(){
-    totalBox.innerHTML = "";
-    Object.keys(total).forEach(k=>{
-        let [name,type] = k.split("||");
-        let pos = "-";
-
-        for(let p in data){
-            if(data[p].includes(name)) pos = p;
-        }
-
-        totalBox.innerHTML += `
-        <div class="row">
-            <div>${pos}</div>
-            <div>${name}</div>
-            <div>${type}</div>
-            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
-        </div>`;
-    });
-}
-
-setInterval(fetchLive, 2000); // ทุก 2 วินาที
+setInterval(fetchLive,2000);
 </script>
+
 </body>
 </html>
