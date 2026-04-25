@@ -221,18 +221,19 @@ function startBreak(){
     };
 
     fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-        name: nameSelect.value,
-        position: positionSelect.value,
-        type: typeSelect.value,
-        action: "START",
-        duration: 0
+        method: "POST",
+        body: JSON.stringify({
+            name: nameSelect.value,
+            position: positionSelect.value,
+            type: typeSelect.value,
+            action: "START",
+            duration: 0
+        })
     })
-})
-.then(res => res.text())
-.then(res => console.log("SERVER:", res))
-.catch(err => console.log("ERROR:", err));
+    .then(res => res.text())
+    .then(res => console.log("SERVER:", res))
+    .catch(err => console.log("ERROR:", err));
+}
 
 
 /* END */
