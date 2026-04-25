@@ -28,6 +28,7 @@ body {
     font-size:56px;
     text-align:center;
     margin-bottom:10px;
+    text-shadow:0 0 10px #8a2be2, 0 0 20px #00c3ff;
 }
 
 .main { display:flex; gap:20px; height:calc(100vh - 100px); }
@@ -46,7 +47,12 @@ body {
 }
 
 .header, .row { display:flex; padding:8px; }
-.header { font-weight:bold; border-bottom:1px solid var(--border); }
+
+.header {
+    font-weight:bold;
+    border-bottom:1px solid var(--border);
+}
+
 .header div, .row div { flex:1; }
 
 .row {
@@ -123,7 +129,7 @@ button:disabled { opacity:0.3; }
 <div class="wrapper">
 
 <div class="box">
-<h3>⏳ ACTIVE</h3>
+<h3>⏳ ACTIVE BREAK</h3>
 <div class="header">
 <div>POS</div>
 <div>NAME</div>
@@ -134,7 +140,7 @@ button:disabled { opacity:0.3; }
 </div>
 
 <div class="box">
-<h3>🧮 TOTAL</h3>
+<h3>🧮 TOTAL TIME</h3>
 <div class="header">
 <div>POS</div>
 <div>NAME</div>
@@ -151,19 +157,19 @@ button:disabled { opacity:0.3; }
 
 <script>
 
-/* 🔥 CHANGE ONLY THIS */
-const API_URL = "https://script.google.com/macros/s/XXXXXXXX/exec";
+/* 🔥 GOOGLE SCRIPT URL */
+const API_URL = "https://script.google.com/macros/s/XXXX/exec";
 
 /* DATA */
 const data = {
-"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส"],
-"QC-SA":["นิด","แนท","แม็ก2","ปู"],
+"Head":["จ่าบอส","สปอย","มด","ป็อป","เบส"],
+"QC-SA":["นิด","แนท","แม็ก2"],
 "QC-SV":["มาร์ค","บอย","โปเต้"],
 "QC-PR":["ฟ้า","พราว","สุ"],
-"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ"],
-"QC-MKT":["มด","มอส","ตุ๊กกี้"],
+"QC-AI":["ผ่อง","หนุ่ย"],
+"QC-MKT":["มด","มอส"],
 "QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง","บอสน้อย"],
+"AD-BO":["ปั้นแป้ง"],
 "AD-STM":["ต่อ","แตงกวา"]
 };
 
@@ -200,49 +206,24 @@ function updateNames(){
     });
 }
 
-/* KEY */
-function key(){
-    return `${nameSelect.value}`;
-}
-
-/* SEND */
-function send(payload, retry=2){
-
-    log("sending...");
-
-    fetch(API_URL,{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
-    })
-    .then(r=>r.text())
-    .then(res=>{
-        log("OK: "+res);
-    })
-    .catch(err=>{
-        log("FAIL: "+err);
-        if(retry>0){
-            setTimeout(()=>send(payload,retry-1),1000);
-        }
-    });
-}
-
-/* START */
+/* START KEY = NAME ONLY (FIX REALTIME BUG) */
 function startBreak(){
-    let k = key();
-    if(!k) return;
 
-    active[k] = {
-        name:nameSelect.value,
-        type:typeSelect.value,
-        pos:positionSelect.value,
-        start:Date.now()
+    let name = nameSelect.value;
+    let type = typeSelect.value;
+    let pos = positionSelect.value;
+
+    if(!name || !type) return;
+
+    active[name] = {
+        name,
+        type,
+        pos,
+        start: Date.now()
     };
 
     send({
-        name:nameSelect.value,
-        position:positionSelect.value,
-        type:typeSelect.value,
+        name, position:pos, type,
         action:"START",
         duration:0
     });
@@ -250,60 +231,79 @@ function startBreak(){
 
 /* END */
 function endBreak(){
-    let k = key();
-    if(!active[k]) return;
 
-    let sec = (Date.now()-active[k].start)/1000;
+    let name = nameSelect.value;
+    let a = active[name];
 
-    total[k]=(total[k]||0)+sec;
+    if(!a) return;
+
+    let sec = (Date.now()-a.start)/1000;
+
+    total[name] = (total[name]||0)+sec;
 
     send({
-        name:active[k].name,
-        position:active[k].pos,
-        type:active[k].type,
+        name:a.name,
+        position:a.pos,
+        type:a.type,
         action:"END",
         duration:sec
     });
 
-    delete active[k];
+    delete active[name];
 }
 
-/* ACTIVE */
+/* SEND SAFE */
+function send(payload){
+
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(r=>r.text())
+    .then(res=>log("OK: "+res))
+    .catch(err=>log("ERR: "+err));
+}
+
+/* ACTIVE TIMER REALTIME */
 function render(){
+
     breakBox.innerHTML="";
+
     Object.keys(active).forEach(k=>{
         let a=active[k];
+
+        let diff = Date.now()-a.start;
+
         breakBox.innerHTML+=`
         <div class="row">
             <div>${a.pos}</div>
             <div>${a.name}</div>
             <div>${a.type}</div>
-            <div>${Math.floor((Date.now()-a.start)/60000)}m</div>
+            <div>${Math.floor(diff/60000)}:${String(Math.floor((diff/1000)%60)).padStart(2,'0')}</div>
         </div>`;
     });
 }
 
 /* TOTAL */
 function renderTotal(){
-    totalBox.innerHTML="";
-    Object.keys(total).forEach(k=>{
-        let [name,type]=k.split("||");
 
-        let pos="-";
-        for(let p in data){
-            if(data[p].includes(name)) pos=p;
-        }
+    totalBox.innerHTML="";
+
+    Object.keys(total).forEach(k=>{
+        let a=active[k]||{};
 
         totalBox.innerHTML+=`
         <div class="row">
-            <div>${pos}</div>
-            <div>${name}</div>
-            <div>${type}</div>
-            <div>${Math.floor(total[k]/60)}m</div>
+            <div>${a.pos||"-"}</div>
+            <div>${k}</div>
+            <div>${a.type||"-"}</div>
+            <div>${Math.floor(total[k]/60)}:${String(Math.floor(total[k]%60)).padStart(2,'0')}</div>
         </div>`;
     });
 }
 
+/* LOOP */
 setInterval(()=>{
     render();
     renderTotal();
