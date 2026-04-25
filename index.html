@@ -29,7 +29,6 @@ body {
     font-size:56px;
     text-align:center;
     margin-bottom:10px;
-    text-shadow:0 0 10px #8a2be2, 0 0 20px #00c3ff;
 }
 
 .main { display:flex; gap:20px; height:calc(100vh - 100px); }
@@ -47,15 +46,9 @@ body {
     border:1px solid var(--border);
 }
 
-.header, .row {
-    display:flex;
-    padding:8px;
-}
+.header, .row { display:flex; padding:8px; }
 
-.header {
-    font-weight:bold;
-    border-bottom:1px solid var(--border);
-}
+.header { font-weight:bold; border-bottom:1px solid var(--border); }
 
 .header div, .row div { flex:1; }
 
@@ -86,7 +79,6 @@ button:disabled { opacity:0.3; }
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left-panel">
 
 <h3>☕ CONTROL</h3>
@@ -123,35 +115,28 @@ button:disabled { opacity:0.3; }
 
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
-<!-- ACTIVE -->
 <div class="box">
 <h3>⏳ ACTIVE BREAK</h3>
-
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
 </div>
-
 <div id="breakBox"></div>
 </div>
 
-<!-- TOTAL -->
 <div class="box">
 <h3>🧮 TOTAL TIME</h3>
-
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
 </div>
-
 <div id="totalBox"></div>
 </div>
 
@@ -162,27 +147,30 @@ button:disabled { opacity:0.3; }
 
 <script>
 
+/* 🔥 API URL (ต้องอยู่บนสุด) */
+const API_URL = "https://script.google.com/macros/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
+
 /* DATA */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-"QC-SV":["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+"QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
 "QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
 "QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-"QC-MKT":["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
+"QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
 "QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่","นิ"],
-"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
+"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
+"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
 };
 
-let active = {};  // current
-let total = {};   // accumulated
+let active = {};
+let total = {};
 
 /* CLOCK */
 setInterval(()=>{
     const n=new Date();
     clockBox.innerText =
-    `🕒 ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+    `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
 },1000);
 
 /* VALIDATE */
@@ -193,7 +181,7 @@ function validateForm(){
     status.innerText = ok ? "READY" : "SELECT DATA";
 }
 
-/* NAME LIST */
+/* NAME */
 function updateNames(){
     nameSelect.innerHTML="<option value=''>ชื่อ</option>";
     (data[positionSelect.value]||[]).forEach(n=>{
@@ -221,20 +209,22 @@ function startBreak(){
         start:Date.now()
     };
 
-    sendStart(nameSelect.value, positionSelect.value, typeSelect.value);
-}
-function sendStart(name, position, type){
     fetch(API_URL,{
         method:"POST",
+        headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
-            name,
-            position,
-            type,
+            name:nameSelect.value,
+            position:positionSelect.value,
+            type:typeSelect.value,
             action:"START",
             duration:0
         })
-    });
+    })
+    .then(r=>r.text())
+    .then(t=>console.log("START OK:",t))
+    .catch(e=>console.log("ERROR:",e));
 }
+
 /* END */
 function endBreak(){
     let k = key();
@@ -244,36 +234,25 @@ function endBreak(){
 
     total[k] = (total[k]||0)+sec;
 
-    sendEnd(
-        active[k].name,
-        active[k].pos,
-        active[k].type,
-        sec
-    );
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+            name:active[k].name,
+            position:active[k].pos,
+            type:active[k].type,
+            action:"END",
+            duration:sec
+        })
+    })
+    .then(r=>r.text())
+    .then(t=>console.log("END OK:",t))
+    .catch(e=>console.log("ERROR:",e));
 
     delete active[k];
 }
-function sendEnd(name, position, type, duration){
-    fetch(API_URL,{
-        method:"POST",
-        body: JSON.stringify({
-            name,
-            position,
-            type,
-            action:"END",
-            duration:duration
-        })
-    });
-}
-/* FORMAT */
-function f(ms){
-    let s=Math.floor(ms/1000);
-    let m=Math.floor(s/60);
-    let r=s%60;
-    return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
-}
 
-/* ACTIVE */
+/* RENDER */
 function render(){
     breakBox.innerHTML="";
     Object.keys(active).forEach(k=>{
@@ -283,32 +262,28 @@ function render(){
             <div>${a.pos}</div>
             <div>${a.name}</div>
             <div>${a.type}</div>
-            <div>${f(Date.now()-a.start)}</div>
+            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
         </div>`;
     });
 }
 
-/* TOTAL (4 LAYERS) */
+/* TOTAL */
 function renderTotal(){
     totalBox.innerHTML="";
-
     Object.keys(total).forEach(k=>{
-        let [name,type] = k.split("||");
+        let [name,type]=k.split("||");
 
-        let pos = "-";
+        let pos="-";
         for(let p in data){
-            if(data[p].includes(name)){
-                pos = p;
-                break;
-            }
+            if(data[p].includes(name)) pos=p;
         }
 
         totalBox.innerHTML+=`
         <div class="row">
             <div>${pos}</div>
             <div>${name}</div>
-            <div>${type || "-"}</div>
-            <div>${f(total[k]*1000)}</div>
+            <div>${type}</div>
+            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
         </div>`;
     });
 }
@@ -318,7 +293,6 @@ setInterval(()=>{
     renderTotal();
 },1000);
 
-    const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
 </script>
 
 </body>
