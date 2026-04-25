@@ -16,13 +16,14 @@
         linear-gradient(135deg, #fff8dc 0%, #f5d27a 50%, #e0b84f 100%);
 
     --text:#3b2f00;
+
     --box: linear-gradient(145deg, #ffffff, #f3e2b0);
     --card: linear-gradient(145deg, #fff8d6, #ffd86b);
     --border:#d4af37;
 }
 
 /* =========================
-   🌑 DARK MODE (DEPTH)
+   DARK MODE
 ========================= */
 body.dark {
     --bg:
@@ -31,6 +32,7 @@ body.dark {
         linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #1a1a1a 100%);
 
     --text:#ffffff;
+
     --box: linear-gradient(145deg, #0a0a0a, #1a1a1a);
     --card: linear-gradient(145deg, #121212, #1f1f1f);
     --border:#2a2a2a;
@@ -43,14 +45,12 @@ body {
     margin:0;
     padding:20px;
     font-family:sans-serif;
-    min-height:100vh;
     background:var(--bg);
     color:var(--text);
-    transition:0.3s;
 }
 
 /* =========================
-   TOP BAR
+   TOP
 ========================= */
 #topBar {
     display:flex;
@@ -60,39 +60,17 @@ body {
 }
 
 #clockBox {
-    font-size:56px;
+    font-size:54px;
     padding:10px 20px;
     border-radius:14px;
     text-align:center;
 
-    background:linear-gradient(145deg,#ffffff,#ffe9a3);
+    background:linear-gradient(145deg,#fff,#ffe9a3);
     border:2px solid #d4af37;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.6),
-        0 6px 20px rgba(212,175,55,0.3);
-}
-
-body.dark #clockBox {
-    background:linear-gradient(145deg,#0a0a0a,#1a1a1a);
-    border:1px solid #2a2a2a;
-}
-
-/* ===== DARK BUTTON ===== */
-#themeBtn {
-    position:absolute;
-    right:10px;
-    top:10px;
-    width:40px;
-    height:40px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    cursor:pointer;
-    font-size:18px;
 }
 
 /* =========================
-   LAYOUT
+   LAYOUT (FIXED)
 ========================= */
 .main {
     display:flex;
@@ -100,72 +78,100 @@ body.dark #clockBox {
     height:calc(100vh - 120px);
 }
 
+/* LEFT = compact */
 .left-panel {
-    width:300px;
+    width:260px;
+    align-self:flex-start; /* ไม่ยืดเต็ม */
 }
 
-.right-panel { flex:1; }
+/* RIGHT = BIG DASHBOARD */
+.right-panel {
+    flex:1;
+}
 
 .wrapper {
     display:flex;
     gap:20px;
-    flex-wrap:wrap;
+    height:100%;
 }
 
 /* =========================
    BOX
 ========================= */
-.box, .left-panel {
+.box {
+    flex:1;
+    min-width:480px;   /* 👈 ทำให้ dashboard ใหญ่ */
     padding:15px;
     border-radius:14px;
+
     background:var(--box);
     border:1px solid var(--border);
 
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.4),
         inset 0 -2px 4px rgba(0,0,0,0.2),
-        0 8px 25px rgba(0,0,0,0.2);
+        0 10px 30px rgba(0,0,0,0.2);
 }
 
 /* =========================
-   TABLE
+   LEFT BOX (COMPACT FIX)
+========================= */
+.left-panel {
+    padding:12px;
+    border-radius:14px;
+
+    background:var(--box);
+    border:1px solid var(--border);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* =========================
+   DASHBOARD TITLE BIG
+========================= */
+h3 {
+    font-size:20px;
+    margin:5px 0 10px;
+}
+
+/* =========================
+   TABLE HEADER
 ========================= */
 .table-header {
     display:flex;
     font-weight:bold;
     font-size:13px;
-    margin-bottom:5px;
+    margin-bottom:8px;
 }
 
 .table-header div { flex:1; }
 
+/* =========================
+   ROW
+========================= */
 .row {
     display:flex;
-    padding:6px;
-    margin:4px 0;
-    border-radius:8px;
+    padding:8px;
+    margin:5px 0;
+    border-radius:10px;
     background:var(--card);
 }
 
-.row div { flex:1; }
-
 /* =========================
-   FORM
+   FORM (COMPACT LEFT)
 ========================= */
 select, button {
     width:100%;
-    padding:10px;
-    font-size:16px;
-    margin-top:5px;
+    padding:8px;
+    font-size:14px;
+    margin-top:6px;
 }
 
 button:disabled {
     opacity:0.4;
     cursor:not-allowed;
-}
-
-#status {
-    margin-top:10px;
 }
 
 /* =========================
@@ -174,6 +180,11 @@ button:disabled {
 .pos { color:#b8860b; font-weight:bold; }
 body.dark .pos { color:#f5d06f; }
 
+#status {
+    margin-top:8px;
+    font-size:13px;
+}
+
 </style>
 </head>
 
@@ -181,13 +192,13 @@ body.dark .pos { color:#f5d06f; }
 
 <div id="topBar">
     <div id="clockBox">🕒</div>
-    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
 </div>
 
 <div class="main">
 
-<!-- LEFT -->
+<!-- LEFT (COMPACT) -->
 <div class="left-panel">
+
 <h3>☕ ลงเวลา</h3>
 
 <select id="positionSelect" onchange="updateNames(); validateForm();">
@@ -211,10 +222,12 @@ body.dark .pos { color:#f5d06f; }
 <button id="endBtn" onclick="endBreak()" disabled>กลับ 💻</button>
 
 <div id="status">กรุณาเลือกข้อมูล</div>
+
 </div>
 
-<!-- RIGHT -->
+<!-- RIGHT (BIG DASHBOARD) -->
 <div class="right-panel">
+
 <div class="wrapper">
 
 <div class="box">
@@ -244,7 +257,7 @@ body.dark .pos { color:#f5d06f; }
 
 <script>
 
-/* DATA */
+/* DATA (เต็ม) */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -279,6 +292,7 @@ function toggleTheme(){
 function validateForm(){
     let p=positionSelect.value;
     let n=nameSelect.value;
+
     let ok = p && n;
 
     startBtn.disabled = !ok;
@@ -287,15 +301,15 @@ function validateForm(){
     status.innerText = ok ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
 }
 
-/* UPDATE NAME */
+/* NAME */
 function updateNames(){
     let p=positionSelect.value;
     nameSelect.innerHTML="<option value=''>ชื่อ</option>";
 
     (data[p]||[]).forEach(n=>{
         let o=document.createElement("option");
-        o.value=n;
         o.text=n;
+        o.value=n;
         nameSelect.appendChild(o);
     });
 }
