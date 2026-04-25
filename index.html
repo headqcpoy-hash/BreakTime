@@ -7,33 +7,31 @@
 <style>
 
 /* =========================
-   🌞 LIGHT MODE (ของเดิม)
+   THEME
 ========================= */
 :root {
     --bg:#f5f5f5;
     --text:#000;
-    --box:#f5f5f5;
+    --box:#ffffff;
     --card:#ffffff;
+    --border:#ddd;
 }
 
-/* =========================
-   🌑 DARK MODE (เพิ่มใหม่)
-========================= */
 body.dark {
     --bg:#0f0f0f;
-    --text:#ffffff;
+    --text:#fff;
     --box:#1a1a1a;
-    --card:#222222;
+    --card:#222;
+    --border:#333;
 }
 
 /* =========================
-   BASE (ใช้ตัวแปร)
+   BASE
 ========================= */
 body {
     margin:0;
     padding:20px;
     font-family:sans-serif;
-    min-height:100vh;
     background:var(--bg);
     color:var(--text);
 }
@@ -42,13 +40,13 @@ body {
    CLOCK
 ========================= */
 #clockBox {
-    font-size:56px;
+    font-size:54px;
     text-align:center;
     margin-bottom:10px;
 }
 
 /* =========================
-   LAYOUT (เหมือนเดิม)
+   LAYOUT
 ========================= */
 .main {
     display:flex;
@@ -58,15 +56,19 @@ body {
 
 .left-panel {
     width:300px;
-    font-size:16px;
 }
 
-.right-panel { flex:1; }
+.right-panel {
+    flex:1;
+}
 
+/* =========================
+   DASHBOARD SIDE BY SIDE
+========================= */
 .wrapper {
     display:flex;
     gap:20px;
-    flex-wrap:wrap;
+    height:100%;
 }
 
 /* =========================
@@ -74,10 +76,49 @@ body {
 ========================= */
 .box {
     flex:1;
-    min-width:450px;
     padding:15px;
     border-radius:12px;
     background:var(--box);
+    border:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+}
+
+/* =========================
+   TITLE
+========================= */
+h3 {
+    margin:0 0 10px 0;
+}
+
+/* =========================
+   HEADER 3 COLUMNS
+========================= */
+.header {
+    display:flex;
+    font-weight:bold;
+    padding:8px;
+    border-bottom:2px solid var(--border);
+    margin-bottom:8px;
+}
+
+.header div {
+    flex:1;
+}
+
+/* =========================
+   ROW 3 COLUMNS
+========================= */
+.row {
+    display:flex;
+    padding:8px;
+    margin:4px 0;
+    background:var(--card);
+    border-radius:8px;
+}
+
+.row div {
+    flex:1;
 }
 
 /* =========================
@@ -86,48 +127,24 @@ body {
 select, button {
     width:100%;
     padding:10px;
-    font-size:16px;
     margin-top:5px;
 }
 
 button:disabled {
     opacity:0.4;
-    cursor:not-allowed;
 }
 
 /* =========================
-   ROW
+   LEFT PANEL
 ========================= */
-.row {
-    display:flex;
-    justify-content:space-between;
-    padding:6px;
-    margin:4px 0;
-    background:var(--card);
-    border-radius:6px;
-}
-
-/* =========================
-   TOGGLE BUTTON (เพิ่มใหม่)
-========================= */
-#themeBtn {
-    position:absolute;
-    top:10px;
-    right:10px;
-    width:40px;
-    height:40px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    cursor:pointer;
+.left-panel {
+    width:300px;
 }
 
 </style>
 </head>
 
 <body>
-
-<!-- 🌙 TOGGLE BUTTON -->
-<button id="themeBtn" onclick="toggleTheme()">🌙</button>
 
 <div id="clockBox">🕒</div>
 
@@ -166,13 +183,29 @@ button:disabled {
 <div class="right-panel">
 <div class="wrapper">
 
+<!-- ⏳ LEFT DASHBOARD -->
 <div class="box">
 <h3>⏳ กำลังพัก</h3>
+
+<div class="header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>เวลา</div>
+</div>
+
 <div id="breakBox"></div>
 </div>
 
+<!-- 🧮 RIGHT DASHBOARD -->
 <div class="box">
 <h3>🧮 เวลาสะสม</h3>
+
+<div class="header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>เวลา</div>
+</div>
+
 <div id="totalBox"></div>
 </div>
 
@@ -183,80 +216,57 @@ button:disabled {
 
 <script>
 
-/* ===== DATA (เดิมทั้งหมด) ===== */
+/* DATA */
 const data = {
-"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
-"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-"QC-SV":["มาร์ค","คนใหม่ หรือคนเก่า","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
-"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
-"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-"QC-MKT":["มด","มอส","เต้ย ก้างปลา 400","ตุ๊กกี้"],
-"QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน","เจนจ้า","ฟ้าครึ้ม","แฟร้ง","บังโด่ง","ฝน","พิมพ์","เจี๊ยบ","ทิพย์ซอ","อุ้ยอ้าย","สนุ๊ก","จารใหม่","นิ"],
-"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
+"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส"],
+"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง"],
+"QC-SV":["มาร์ค","บอย","โปเต้"],
+"QC-PR":["ฟ้า","พราว","สุ"],
+"QC-AI":["ผ่อง","หนุ่ย"],
+"QC-MKT":["มด","มอส"],
+"QC-Support":["เบล"],
+"AD-BO":["ปั้นแป้ง","บอสน้อย"],
+"AD-STM":["ต่อ","แตงกวา"]
 };
 
 let status = {};
 let total = {};
 
-/* ===== DARK TOGGLE ===== */
-function toggleTheme(){
-    document.body.classList.toggle("dark");
-}
-
-/* ===== CLOCK ===== */
-function clock(){
+/* CLOCK */
+setInterval(()=>{
     const n=new Date();
-    const hh=String(n.getHours()).padStart(2,'0');
-    const mm=String(n.getMinutes()).padStart(2,'0');
-    const ss=String(n.getSeconds()).padStart(2,'0');
-    document.getElementById("clockBox").innerHTML =
-    `🕒 ${hh}:${mm}:${ss}`;
-}
-setInterval(clock,1000);
-clock();
+    clockBox.innerText =
+    `🕒 ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+},1000);
 
-/* ===== VALIDATE ===== */
+/* VALIDATE */
 function validateForm(){
-    let pos = document.getElementById("positionSelect").value;
-    let name = document.getElementById("nameSelect").value;
-
-    let enable = pos && name;
-
-    document.getElementById("startBtn").disabled = !enable;
-    document.getElementById("endBtn").disabled = !enable;
-
-    document.getElementById("status").innerText =
-        enable ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
+    let ok = positionSelect.value && nameSelect.value;
+    startBtn.disabled = !ok;
+    endBtn.disabled = !ok;
+    status.innerText = ok ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
 }
 
-/* ===== UPDATE NAME ===== */
+/* NAME */
 function updateNames(){
-    let p=document.getElementById("positionSelect").value;
-    let s=document.getElementById("nameSelect");
-
-    s.innerHTML="<option value=''>ชื่อ</option>";
-
-    (data[p]||[]).forEach(n=>{
+    nameSelect.innerHTML="<option value=''>ชื่อ</option>";
+    (data[positionSelect.value]||[]).forEach(n=>{
         let o=document.createElement("option");
-        o.text=n;
         o.value=n;
-        s.appendChild(o);
+        o.text=n;
+        nameSelect.appendChild(o);
     });
 }
 
-/* ===== START ===== */
+/* START / END */
 function startBreak(){
-    let n=document.getElementById("nameSelect").value;
+    let n=nameSelect.value;
     if(!n) return;
     status[n]=Date.now();
 }
 
-/* ===== END ===== */
 function endBreak(){
-    let n=document.getElementById("nameSelect").value;
-    if(!n) return;
-
+    let n=nameSelect.value;
     if(status[n]){
         let sec=(Date.now()-status[n])/1000;
         total[n]=(total[n]||0)+sec;
@@ -264,33 +274,42 @@ function endBreak(){
     }
 }
 
-/* ===== FORMAT ===== */
+/* FORMAT */
 function f(ms){
     let s=Math.floor(ms/1000);
-    let m=String(Math.floor(s/60)).padStart(2,'0');
-    let r=String(s%60).padStart(2,'0');
-    return `${m}:${r}`;
+    return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
 
-/* ===== RENDER ===== */
+/* POSITION */
+function pos(n){
+    for(let p in data){
+        if(data[p].includes(n)) return p;
+    }
+    return "-";
+}
+
+/* RENDER BREAK */
 function render(){
     breakBox.innerHTML="";
     Object.keys(status).forEach(n=>{
         breakBox.innerHTML+=`
         <div class="row">
-            <span>${n}</span>
-            <span>${f(Date.now()-status[n])}</span>
+            <div>${pos(n)}</div>
+            <div>${n}</div>
+            <div>${f(Date.now()-status[n])}</div>
         </div>`;
     });
 }
 
+/* RENDER TOTAL */
 function renderTotal(){
     totalBox.innerHTML="";
     Object.keys(total).forEach(n=>{
         totalBox.innerHTML+=`
         <div class="row">
-            <span>${n}</span>
-            <span>${f(total[n]*1000)}</span>
+            <div>${pos(n)}</div>
+            <div>${n}</div>
+            <div>${f(total[n]*1000)}</div>
         </div>`;
     });
 }
