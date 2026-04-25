@@ -10,7 +10,6 @@
         radial-gradient(circle at 20% 20%, rgba(140,0,255,0.25), transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(0,180,255,0.25), transparent 40%),
         linear-gradient(135deg, #070014 0%, #0b0033 40%, #050018 100%);
-
     --text:#e8e6ff;
     --box: linear-gradient(145deg, rgba(30,0,60,0.8), rgba(10,0,30,0.9));
     --card: linear-gradient(145deg, rgba(120,0,255,0.15), rgba(0,180,255,0.10));
@@ -47,9 +46,7 @@ body {
 }
 
 .header, .row { display:flex; padding:8px; }
-
 .header { font-weight:bold; border-bottom:1px solid var(--border); }
-
 .header div, .row div { flex:1; }
 
 .row {
@@ -69,7 +66,11 @@ select, button {
 
 button:disabled { opacity:0.3; }
 
-#status { margin-top:10px; }
+#status, #debug {
+    margin-top:10px;
+    font-size:12px;
+    color:#0ff;
+}
 </style>
 </head>
 
@@ -79,6 +80,7 @@ button:disabled { opacity:0.3; }
 
 <div class="main">
 
+<!-- LEFT -->
 <div class="left-panel">
 
 <h3>☕ CONTROL</h3>
@@ -111,17 +113,19 @@ button:disabled { opacity:0.3; }
 <button id="startBtn" onclick="startBreak()" disabled>START</button>
 <button id="endBtn" onclick="endBreak()" disabled>END</button>
 
-<div id="status">SYSTEM READY</div>
+<div id="status">READY</div>
+<div id="debug"></div>
 
 </div>
 
+<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
 <div class="box">
-<h3>⏳ ACTIVE BREAK</h3>
+<h3>⏳ ACTIVE</h3>
 <div class="header">
-<div>POSITION</div>
+<div>POS</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
@@ -130,9 +134,9 @@ button:disabled { opacity:0.3; }
 </div>
 
 <div class="box">
-<h3>🧮 TOTAL TIME</h3>
+<h3>🧮 TOTAL</h3>
 <div class="header">
-<div>POSITION</div>
+<div>POS</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
@@ -147,20 +151,20 @@ button:disabled { opacity:0.3; }
 
 <script>
 
-/* 🔥 API URL (ต้องอยู่บนสุด) */
-const API_URL = "https://script.google.com/macros/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
+/* 🔥 CHANGE ONLY THIS */
+const API_URL = "https://script.google.com/macros/s/XXXXXXXX/exec";
 
 /* DATA */
 const data = {
-"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
-"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
-"QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
-"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
-"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
-"QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
+"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส"],
+"QC-SA":["นิด","แนท","แม็ก2","ปู"],
+"QC-SV":["มาร์ค","บอย","โปเต้"],
+"QC-PR":["ฟ้า","พราว","สุ"],
+"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ"],
+"QC-MKT":["มด","มอส","ตุ๊กกี้"],
 "QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
-"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
+"AD-BO":["ปั้นแป้ง","บอสน้อย"],
+"AD-STM":["ต่อ","แตงกวา"]
 };
 
 let active = {};
@@ -170,15 +174,19 @@ let total = {};
 setInterval(()=>{
     const n=new Date();
     clockBox.innerText =
-    `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
+    `🕒 ${n.toLocaleTimeString()}`;
 },1000);
+
+/* DEBUG */
+function log(msg){
+    debug.innerText = msg;
+}
 
 /* VALIDATE */
 function validateForm(){
     let ok = positionSelect.value && nameSelect.value && typeSelect.value;
     startBtn.disabled = !ok;
     endBtn.disabled = !ok;
-    status.innerText = ok ? "READY" : "SELECT DATA";
 }
 
 /* NAME */
@@ -197,6 +205,28 @@ function key(){
     return `${nameSelect.value}||${typeSelect.value}`;
 }
 
+/* SEND */
+function send(payload, retry=2){
+
+    log("sending...");
+
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(r=>r.text())
+    .then(res=>{
+        log("OK: "+res);
+    })
+    .catch(err=>{
+        log("FAIL: "+err);
+        if(retry>0){
+            setTimeout(()=>send(payload,retry-1),1000);
+        }
+    });
+}
+
 /* START */
 function startBreak(){
     let k = key();
@@ -209,20 +239,13 @@ function startBreak(){
         start:Date.now()
     };
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-            name:nameSelect.value,
-            position:positionSelect.value,
-            type:typeSelect.value,
-            action:"START",
-            duration:0
-        })
-    })
-    .then(r=>r.text())
-    .then(t=>console.log("START OK:",t))
-    .catch(e=>console.log("ERROR:",e));
+    send({
+        name:nameSelect.value,
+        position:positionSelect.value,
+        type:typeSelect.value,
+        action:"START",
+        duration:0
+    });
 }
 
 /* END */
@@ -232,27 +255,20 @@ function endBreak(){
 
     let sec = (Date.now()-active[k].start)/1000;
 
-    total[k] = (total[k]||0)+sec;
+    total[k]=(total[k]||0)+sec;
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-            name:active[k].name,
-            position:active[k].pos,
-            type:active[k].type,
-            action:"END",
-            duration:sec
-        })
-    })
-    .then(r=>r.text())
-    .then(t=>console.log("END OK:",t))
-    .catch(e=>console.log("ERROR:",e));
+    send({
+        name:active[k].name,
+        position:active[k].pos,
+        type:active[k].type,
+        action:"END",
+        duration:sec
+    });
 
     delete active[k];
 }
 
-/* RENDER */
+/* ACTIVE */
 function render(){
     breakBox.innerHTML="";
     Object.keys(active).forEach(k=>{
@@ -262,7 +278,7 @@ function render(){
             <div>${a.pos}</div>
             <div>${a.name}</div>
             <div>${a.type}</div>
-            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
+            <div>${Math.floor((Date.now()-a.start)/60000)}m</div>
         </div>`;
     });
 }
@@ -283,7 +299,7 @@ function renderTotal(){
             <div>${pos}</div>
             <div>${name}</div>
             <div>${type}</div>
-            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
+            <div>${Math.floor(total[k]/60)}m</div>
         </div>`;
     });
 }
