@@ -6,24 +6,102 @@
 
 <style>
 
-/* ===== FULLSCREEN ===== */
+/* =========================
+   🌟 LIGHT (GOLD DEPTH)
+========================= */
+:root {
+    --bg:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255,215,120,0.3), transparent 40%),
+        linear-gradient(135deg, #fff8dc 0%, #f5d27a 50%, #e0b84f 100%);
+
+    --text:#3b2f00;
+    --box: linear-gradient(145deg, #ffffff, #f3e2b0);
+    --card: linear-gradient(145deg, #fff8d6, #ffd86b);
+    --border:#d4af37;
+}
+
+/* =========================
+   🌑 DARK MODE (DEPTH)
+========================= */
+body.dark {
+    --bg:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.05), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 40%),
+        linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #1a1a1a 100%);
+
+    --text:#ffffff;
+    --box: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+    --card: linear-gradient(145deg, #121212, #1f1f1f);
+    --border:#2a2a2a;
+}
+
+/* =========================
+   BASE
+========================= */
 body {
     margin:0;
     padding:20px;
     font-family:sans-serif;
     min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    transition:0.3s;
 }
 
-/* ===== LAYOUT ===== */
+/* =========================
+   TOP BAR
+========================= */
+#topBar {
+    display:flex;
+    justify-content:center;
+    position:relative;
+    margin-bottom:10px;
+}
+
+#clockBox {
+    font-size:56px;
+    padding:10px 20px;
+    border-radius:14px;
+    text-align:center;
+
+    background:linear-gradient(145deg,#ffffff,#ffe9a3);
+    border:2px solid #d4af37;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.6),
+        0 6px 20px rgba(212,175,55,0.3);
+}
+
+body.dark #clockBox {
+    background:linear-gradient(145deg,#0a0a0a,#1a1a1a);
+    border:1px solid #2a2a2a;
+}
+
+/* ===== DARK BUTTON ===== */
+#themeBtn {
+    position:absolute;
+    right:10px;
+    top:10px;
+    width:40px;
+    height:40px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* =========================
+   LAYOUT
+========================= */
 .main {
     display:flex;
     gap:20px;
-    height:calc(100vh - 100px);
+    height:calc(100vh - 120px);
 }
 
 .left-panel {
     width:300px;
-    font-size:16px;
 }
 
 .right-panel { flex:1; }
@@ -34,23 +112,46 @@ body {
     flex-wrap:wrap;
 }
 
-/* ===== BOX ===== */
-.box {
-    flex:1;
-    min-width:450px;
+/* =========================
+   BOX
+========================= */
+.box, .left-panel {
     padding:15px;
-    border-radius:12px;
-    background:#f5f5f5;
+    border-radius:14px;
+    background:var(--box);
+    border:1px solid var(--border);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.2),
+        0 8px 25px rgba(0,0,0,0.2);
 }
 
-/* ===== CLOCK ===== */
-#clockBox {
-    font-size:56px;
-    text-align:center;
-    margin-bottom:10px;
+/* =========================
+   TABLE
+========================= */
+.table-header {
+    display:flex;
+    font-weight:bold;
+    font-size:13px;
+    margin-bottom:5px;
 }
 
-/* ===== FORM ===== */
+.table-header div { flex:1; }
+
+.row {
+    display:flex;
+    padding:6px;
+    margin:4px 0;
+    border-radius:8px;
+    background:var(--card);
+}
+
+.row div { flex:1; }
+
+/* =========================
+   FORM
+========================= */
 select, button {
     width:100%;
     padding:10px;
@@ -65,31 +166,28 @@ button:disabled {
 
 #status {
     margin-top:10px;
-    font-weight:bold;
 }
 
-/* ===== ROW ===== */
-.row {
-    display:flex;
-    justify-content:space-between;
-    padding:6px;
-    margin:4px 0;
-    background:#fff;
-    border-radius:6px;
-}
+/* =========================
+   TEXT
+========================= */
+.pos { color:#b8860b; font-weight:bold; }
+body.dark .pos { color:#f5d06f; }
 
 </style>
 </head>
 
 <body>
 
-<div id="clockBox">🕒</div>
+<div id="topBar">
+    <div id="clockBox">🕒</div>
+    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+</div>
 
 <div class="main">
 
 <!-- LEFT -->
 <div class="left-panel">
-
 <h3>☕ ลงเวลา</h3>
 
 <select id="positionSelect" onchange="updateNames(); validateForm();">
@@ -113,7 +211,6 @@ button:disabled {
 <button id="endBtn" onclick="endBreak()" disabled>กลับ 💻</button>
 
 <div id="status">กรุณาเลือกข้อมูล</div>
-
 </div>
 
 <!-- RIGHT -->
@@ -122,11 +219,21 @@ button:disabled {
 
 <div class="box">
 <h3>⏳ กำลังพัก</h3>
+<div class="table-header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>เวลา</div>
+</div>
 <div id="breakBox"></div>
 </div>
 
 <div class="box">
 <h3>🧮 เวลาสะสม</h3>
+<div class="table-header">
+<div>ตำแหน่ง</div>
+<div>ชื่อ</div>
+<div>เวลา</div>
+</div>
 <div id="totalBox"></div>
 </div>
 
@@ -137,7 +244,7 @@ button:disabled {
 
 <script>
 
-/* ===== DATA เต็ม ===== */
+/* DATA */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -153,58 +260,55 @@ const data = {
 let status = {};
 let total = {};
 
-/* ===== CLOCK ===== */
+/* CLOCK */
 function clock(){
     const n=new Date();
     const hh=String(n.getHours()).padStart(2,'0');
     const mm=String(n.getMinutes()).padStart(2,'0');
     const ss=String(n.getSeconds()).padStart(2,'0');
-
-    document.getElementById("clockBox").innerHTML =
-    `🕒 ${hh}:${mm}:${ss}`;
+    document.getElementById("clockBox").innerHTML = `🕒 ${hh}:${mm}:${ss}`;
 }
 setInterval(clock,1000);
-clock();
 
-/* ===== VALIDATE ===== */
-function validateForm(){
-    let pos = document.getElementById("positionSelect").value;
-    let name = document.getElementById("nameSelect").value;
-
-    let enable = pos && name;
-
-    document.getElementById("startBtn").disabled = !enable;
-    document.getElementById("endBtn").disabled = !enable;
-
-    document.getElementById("status").innerText =
-        enable ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
+/* THEME */
+function toggleTheme(){
+    document.body.classList.toggle("dark");
 }
 
-/* ===== UPDATE NAME ===== */
-function updateNames(){
-    let p=document.getElementById("positionSelect").value;
-    let s=document.getElementById("nameSelect");
+/* VALIDATE */
+function validateForm(){
+    let p=positionSelect.value;
+    let n=nameSelect.value;
+    let ok = p && n;
 
-    s.innerHTML="<option value=''>ชื่อ</option>";
+    startBtn.disabled = !ok;
+    endBtn.disabled = !ok;
+
+    status.innerText = ok ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
+}
+
+/* UPDATE NAME */
+function updateNames(){
+    let p=positionSelect.value;
+    nameSelect.innerHTML="<option value=''>ชื่อ</option>";
 
     (data[p]||[]).forEach(n=>{
         let o=document.createElement("option");
-        o.text=n;
         o.value=n;
-        s.appendChild(o);
+        o.text=n;
+        nameSelect.appendChild(o);
     });
 }
 
-/* ===== START ===== */
+/* START / END */
 function startBreak(){
-    let n=document.getElementById("nameSelect").value;
+    let n=nameSelect.value;
     if(!n) return;
     status[n]=Date.now();
 }
 
-/* ===== END ===== */
 function endBreak(){
-    let n=document.getElementById("nameSelect").value;
+    let n=nameSelect.value;
     if(!n) return;
 
     if(status[n]){
@@ -214,7 +318,7 @@ function endBreak(){
     }
 }
 
-/* ===== FORMAT ===== */
+/* FORMAT */
 function f(ms){
     let s=Math.floor(ms/1000);
     let m=String(Math.floor(s/60)).padStart(2,'0');
@@ -222,7 +326,7 @@ function f(ms){
     return `${m}:${r}`;
 }
 
-/* ===== POSITION ===== */
+/* POSITION */
 function pos(n){
     for(let p in data){
         if(data[p].includes(n)) return p;
@@ -230,29 +334,27 @@ function pos(n){
     return "-";
 }
 
-/* ===== RENDER ===== */
+/* RENDER */
 function render(){
-    let b=document.getElementById("breakBox");
-    b.innerHTML="";
+    breakBox.innerHTML="";
     Object.keys(status).forEach(n=>{
-        b.innerHTML+= `
+        breakBox.innerHTML+=`
         <div class="row">
-            <span>${pos(n)}</span>
-            <span>${n}</span>
-            <span>${f(Date.now()-status[n])}</span>
+            <div class="pos">${pos(n)}</div>
+            <div>${n}</div>
+            <div>${f(Date.now()-status[n])}</div>
         </div>`;
     });
 }
 
 function renderTotal(){
-    let b=document.getElementById("totalBox");
-    b.innerHTML="";
+    totalBox.innerHTML="";
     Object.keys(total).forEach(n=>{
-        b.innerHTML+= `
+        totalBox.innerHTML+=`
         <div class="row">
-            <span>${pos(n)}</span>
-            <span>${n}</span>
-            <span>${f(total[n]*1000)}</span>
+            <div class="pos">${pos(n)}</div>
+            <div>${n}</div>
+            <div>${f(total[n]*1000)}</div>
         </div>`;
     });
 }
