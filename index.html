@@ -220,8 +220,21 @@ function startBreak(){
         pos:positionSelect.value,
         start:Date.now()
     };
-}
 
+    sendStart(nameSelect.value, positionSelect.value, typeSelect.value);
+}
+function sendStart(name, position, type){
+    fetch(API_URL,{
+        method:"POST",
+        body: JSON.stringify({
+            name,
+            position,
+            type,
+            action:"START",
+            duration:0
+        })
+    });
+}
 /* END */
 function endBreak(){
     let k = key();
@@ -230,9 +243,28 @@ function endBreak(){
     let sec = (Date.now()-active[k].start)/1000;
 
     total[k] = (total[k]||0)+sec;
+
+    sendEnd(
+        active[k].name,
+        active[k].pos,
+        active[k].type,
+        sec
+    );
+
     delete active[k];
 }
-
+function sendEnd(name, position, type, duration){
+    fetch(API_URL,{
+        method:"POST",
+        body: JSON.stringify({
+            name,
+            position,
+            type,
+            action:"END",
+            duration:duration
+        })
+    });
+}
 /* FORMAT */
 function f(ms){
     let s=Math.floor(ms/1000);
@@ -286,6 +318,7 @@ setInterval(()=>{
     renderTotal();
 },1000);
 
+    const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
 </script>
 
 </body>
