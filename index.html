@@ -10,6 +10,7 @@
         radial-gradient(circle at 20% 20%, rgba(140,0,255,0.25), transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(0,180,255,0.25), transparent 40%),
         linear-gradient(135deg, #070014 0%, #0b0033 40%, #050018 100%);
+
     --text:#e8e6ff;
     --box: linear-gradient(145deg, rgba(30,0,60,0.8), rgba(10,0,30,0.9));
     --card: linear-gradient(145deg, rgba(120,0,255,0.15), rgba(0,180,255,0.10));
@@ -28,7 +29,6 @@ body {
     font-size:56px;
     text-align:center;
     margin-bottom:10px;
-    text-shadow:0 0 10px #8a2be2, 0 0 20px #00c3ff;
 }
 
 .main { display:flex; gap:20px; height:calc(100vh - 100px); }
@@ -48,10 +48,7 @@ body {
 
 .header, .row { display:flex; padding:8px; }
 
-.header {
-    font-weight:bold;
-    border-bottom:1px solid var(--border);
-}
+.header { font-weight:bold; border-bottom:1px solid var(--border); }
 
 .header div, .row div { flex:1; }
 
@@ -72,11 +69,7 @@ select, button {
 
 button:disabled { opacity:0.3; }
 
-#status, #debug {
-    margin-top:10px;
-    font-size:12px;
-    color:#0ff;
-}
+#status { margin-top:10px; }
 </style>
 </head>
 
@@ -86,7 +79,6 @@ button:disabled { opacity:0.3; }
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left-panel">
 
 <h3>☕ CONTROL</h3>
@@ -119,19 +111,17 @@ button:disabled { opacity:0.3; }
 <button id="startBtn" onclick="startBreak()" disabled>START</button>
 <button id="endBtn" onclick="endBreak()" disabled>END</button>
 
-<div id="status">READY</div>
-<div id="debug"></div>
+<div id="status">SYSTEM READY</div>
 
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
 <div class="box">
 <h3>⏳ ACTIVE BREAK</h3>
 <div class="header">
-<div>POS</div>
+<div>POSITION</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
@@ -142,7 +132,7 @@ button:disabled { opacity:0.3; }
 <div class="box">
 <h3>🧮 TOTAL TIME</h3>
 <div class="header">
-<div>POS</div>
+<div>POSITION</div>
 <div>NAME</div>
 <div>TYPE</div>
 <div>TIME</div>
@@ -157,20 +147,20 @@ button:disabled { opacity:0.3; }
 
 <script>
 
-/* 🔥 GOOGLE SCRIPT URL */
-const API_URL = "https://script.google.com/macros/s/XXXX/exec";
+/* 🔥 API URL (ต้องอยู่บนสุด) */
+const API_URL = "https://script.google.com/macros/s/AKfycbwsvWDuB_zco3HWP8m3Dvm0lP2RTlH7v0LvO7aE1Wk0yghwW7KMAC_kHWQVRKgYANiSgg/exec";
 
 /* DATA */
 const data = {
-"Head":["จ่าบอส","สปอย","มด","ป็อป","เบส"],
-"QC-SA":["นิด","แนท","แม็ก2"],
-"QC-SV":["มาร์ค","บอย","โปเต้"],
-"QC-PR":["ฟ้า","พราว","สุ"],
-"QC-AI":["ผ่อง","หนุ่ย"],
-"QC-MKT":["มด","มอส"],
+"Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
+"QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
+"QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+"QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
+"QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
+"QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
 "QC-Support":["เบล","อุ้ม"],
-"AD-BO":["ปั้นแป้ง"],
-"AD-STM":["ต่อ","แตงกวา"]
+"AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
+"AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
 };
 
 let active = {};
@@ -180,19 +170,15 @@ let total = {};
 setInterval(()=>{
     const n=new Date();
     clockBox.innerText =
-    `🕒 ${n.toLocaleTimeString()}`;
+    `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
 },1000);
-
-/* DEBUG */
-function log(msg){
-    debug.innerText = msg;
-}
 
 /* VALIDATE */
 function validateForm(){
     let ok = positionSelect.value && nameSelect.value && typeSelect.value;
     startBtn.disabled = !ok;
     endBtn.disabled = !ok;
+    status.innerText = ok ? "READY" : "SELECT DATA";
 }
 
 /* NAME */
@@ -206,104 +192,102 @@ function updateNames(){
     });
 }
 
-/* START KEY = NAME ONLY (FIX REALTIME BUG) */
+/* KEY */
+function key(){
+    return `${nameSelect.value}||${typeSelect.value}`;
+}
+
+/* START */
 function startBreak(){
+    let k = key();
+    if(!k) return;
 
-    let name = nameSelect.value;
-    let type = typeSelect.value;
-    let pos = positionSelect.value;
-
-    if(!name || !type) return;
-
-    active[name] = {
-        name,
-        type,
-        pos,
-        start: Date.now()
+    active[k] = {
+        name:nameSelect.value,
+        type:typeSelect.value,
+        pos:positionSelect.value,
+        start:Date.now()
     };
-
-    send({
-        name, position:pos, type,
-        action:"START",
-        duration:0
-    });
-}
-
-/* END */
-function endBreak(){
-
-    let name = nameSelect.value;
-    let a = active[name];
-
-    if(!a) return;
-
-    let sec = (Date.now()-a.start)/1000;
-
-    total[name] = (total[name]||0)+sec;
-
-    send({
-        name:a.name,
-        position:a.pos,
-        type:a.type,
-        action:"END",
-        duration:sec
-    });
-
-    delete active[name];
-}
-
-/* SEND SAFE */
-function send(payload){
 
     fetch(API_URL,{
         method:"POST",
         headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            name:nameSelect.value,
+            position:positionSelect.value,
+            type:typeSelect.value,
+            action:"START",
+            duration:0
+        })
     })
     .then(r=>r.text())
-    .then(res=>log("OK: "+res))
-    .catch(err=>log("ERR: "+err));
+    .then(t=>console.log("START OK:",t))
+    .catch(e=>console.log("ERROR:",e));
 }
 
-/* ACTIVE TIMER REALTIME */
+/* END */
+function endBreak(){
+    let k = key();
+    if(!active[k]) return;
+
+    let sec = (Date.now()-active[k].start)/1000;
+
+    total[k] = (total[k]||0)+sec;
+
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+            name:active[k].name,
+            position:active[k].pos,
+            type:active[k].type,
+            action:"END",
+            duration:sec
+        })
+    })
+    .then(r=>r.text())
+    .then(t=>console.log("END OK:",t))
+    .catch(e=>console.log("ERROR:",e));
+
+    delete active[k];
+}
+
+/* RENDER */
 function render(){
-
     breakBox.innerHTML="";
-
     Object.keys(active).forEach(k=>{
         let a=active[k];
-
-        let diff = Date.now()-a.start;
-
         breakBox.innerHTML+=`
         <div class="row">
             <div>${a.pos}</div>
             <div>${a.name}</div>
             <div>${a.type}</div>
-            <div>${Math.floor(diff/60000)}:${String(Math.floor((diff/1000)%60)).padStart(2,'0')}</div>
+            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
         </div>`;
     });
 }
 
 /* TOTAL */
 function renderTotal(){
-
     totalBox.innerHTML="";
-
     Object.keys(total).forEach(k=>{
-        let a=active[k]||{};
+        let [name,type]=k.split("||");
+
+        let pos="-";
+        for(let p in data){
+            if(data[p].includes(name)) pos=p;
+        }
 
         totalBox.innerHTML+=`
         <div class="row">
-            <div>${a.pos||"-"}</div>
-            <div>${k}</div>
-            <div>${a.type||"-"}</div>
-            <div>${Math.floor(total[k]/60)}:${String(Math.floor(total[k]%60)).padStart(2,'0')}</div>
+            <div>${pos}</div>
+            <div>${name}</div>
+            <div>${type}</div>
+            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
         </div>`;
     });
 }
 
-/* LOOP */
 setInterval(()=>{
     render();
     renderTotal();
