@@ -5,10 +5,6 @@
 <title>Break Dashboard</title>
 
 <style>
-
-/* =========================
-   🌌 SCIFI THEME
-========================= */
 :root {
     --bg:
         radial-gradient(circle at 20% 20%, rgba(140,0,255,0.25), transparent 40%),
@@ -21,9 +17,6 @@
     --border: rgba(160,80,255,0.5);
 }
 
-/* =========================
-   BASE
-========================= */
 body {
     margin:0;
     padding:20px;
@@ -32,9 +25,6 @@ body {
     color:var(--text);
 }
 
-/* =========================
-   CLOCK
-========================= */
 #clockBox {
     font-size:56px;
     text-align:center;
@@ -42,26 +32,12 @@ body {
     text-shadow:0 0 10px #8a2be2, 0 0 20px #00c3ff;
 }
 
-/* =========================
-   LAYOUT
-========================= */
-.main {
-    display:flex;
-    gap:20px;
-    height:calc(100vh - 100px);
-}
-
+.main { display:flex; gap:20px; height:calc(100vh - 100px); }
 .left-panel { width:300px; }
 .right-panel { flex:1; }
 
-.wrapper {
-    display:flex;
-    gap:20px;
-}
+.wrapper { display:flex; gap:20px; }
 
-/* =========================
-   BOX
-========================= */
 .box {
     flex:1;
     min-width:450px;
@@ -71,34 +47,20 @@ body {
     border:1px solid var(--border);
 }
 
-/* =========================
-   HEADER
-========================= */
-.header {
+.header, .row {
     display:flex;
-    font-weight:bold;
     padding:8px;
-    border-bottom:1px solid var(--border);
 }
 
-.header div { flex:1; }
+.header { font-weight:bold; border-bottom:1px solid var(--border); }
+.header div, .row div { flex:1; }
 
-/* =========================
-   ROW
-========================= */
 .row {
-    display:flex;
-    padding:8px;
     margin:5px 0;
     border-radius:10px;
     background:var(--card);
 }
 
-.row div { flex:1; }
-
-/* =========================
-   FORM
-========================= */
 select, button {
     width:100%;
     padding:10px;
@@ -108,14 +70,9 @@ select, button {
     border:1px solid var(--border);
 }
 
-button:disabled {
-    opacity:0.3;
-}
+button:disabled { opacity:0.3; }
 
-#status {
-    margin-top:10px;
-}
-
+#status { margin-top:10px; }
 </style>
 </head>
 
@@ -125,7 +82,6 @@ button:disabled {
 
 <div class="main">
 
-<!-- LEFT -->
 <div class="left-panel">
 
 <h3>☕ CONTROL</h3>
@@ -147,6 +103,15 @@ button:disabled {
 <option value="">ชื่อ</option>
 </select>
 
+<!-- ✅ เพิ่มใหม่ -->
+<select id="typeSelect" onchange="validateForm()">
+<option value="">ประเภทธุระ</option>
+<option>พักกินข้าว</option>
+<option>เข้าห้องน้ำ</option>
+<option>สูบบุหรี่</option>
+<option>เอาของ(ส่วนรวม)</option>
+</select>
+
 <button id="startBtn" onclick="startBreak()" disabled>START</button>
 <button id="endBtn" onclick="endBreak()" disabled>END</button>
 
@@ -154,33 +119,27 @@ button:disabled {
 
 </div>
 
-<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
-<!-- BREAK -->
 <div class="box">
 <h3>⏳ ACTIVE BREAK</h3>
-
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
+<div>TYPE</div>
 <div>TIME</div>
 </div>
-
 <div id="breakBox"></div>
 </div>
 
-<!-- TOTAL -->
 <div class="box">
 <h3>🧮 TOTAL TIME</h3>
-
 <div class="header">
 <div>POSITION</div>
 <div>NAME</div>
 <div>TIME</div>
 </div>
-
 <div id="totalBox"></div>
 </div>
 
@@ -191,7 +150,6 @@ button:disabled {
 
 <script>
 
-/* ===== DATA ===== */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -204,30 +162,28 @@ const data = {
 "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2","แอมมี่","เมย์","ต้อ","แหลม","เก๋","ส้ม","ตั๊ก","เฟิร์น"]
 };
 
-let status = {};
-let total = {};
+let status = {};   // start time
+let total = {};    // total time
 
-/* ===== CLOCK ===== */
+/* type เก็บคู่ key = name+type */
+let active = {};
+
+/* CLOCK */
 setInterval(()=>{
     const n=new Date();
     clockBox.innerText =
     `🕒 ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
 },1000);
 
-/* ===== VALIDATE SAFE ===== */
+/* VALIDATE */
 function validateForm(){
-    let pos = (positionSelect.value || "").trim();
-    let name = (nameSelect.value || "").trim();
-
-    let ok = pos && name && name !== "innerText";
-
+    let ok = positionSelect.value && nameSelect.value && typeSelect.value;
     startBtn.disabled = !ok;
     endBtn.disabled = !ok;
-
     status.innerText = ok ? "READY" : "SELECT DATA";
 }
 
-/* ===== NAME ===== */
+/* NAME */
 function updateNames(){
     nameSelect.innerHTML="<option value=''>ชื่อ</option>";
     (data[positionSelect.value]||[]).forEach(n=>{
@@ -238,83 +194,67 @@ function updateNames(){
     });
 }
 
-/* ===== START SAFE ===== */
+/* KEY */
+function key(){
+    return `${nameSelect.value}||${typeSelect.value}`;
+}
+
+/* START */
 function startBreak(){
-    let n=(nameSelect.value||"").trim();
-
-    if(!n || n==="innerText") return;
-
-    status[n]=Date.now();
+    let k = key();
+    if(!k) return;
+    active[k] = {
+        name:nameSelect.value,
+        type:typeSelect.value,
+        pos:positionSelect.value,
+        start:Date.now()
+    };
 }
 
-/* ===== END SAFE ===== */
+/* END */
 function endBreak(){
-    let n=(nameSelect.value||"").trim();
+    let k = key();
+    if(!active[k]) return;
 
-    if(!n || !status[n]) return;
+    let sec = (Date.now()-active[k].start)/1000;
 
-    let sec=(Date.now()-status[n])/1000;
-
-    if(!isFinite(sec)) return;
-
-    total[n]=(total[n]||0)+sec;
-    delete status[n];
+    total[k] = (total[k]||0)+sec;
+    delete active[k];
 }
 
-/* ===== FORMAT SAFE ===== */
+/* FORMAT */
 function f(ms){
-    if(!ms || isNaN(ms)) return "00:00";
-
     let s=Math.floor(ms/1000);
     let m=Math.floor(s/60);
     let r=s%60;
-
-    if(!isFinite(m) || !isFinite(r)) return "00:00";
-
     return `${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;
 }
 
-/* ===== POSITION ===== */
-function pos(n){
-    for(let p in data){
-        if(data[p].includes(n)) return p;
-    }
-    return "-";
-}
-
-/* ===== RENDER SAFE ===== */
+/* RENDER ACTIVE */
 function render(){
     breakBox.innerHTML="";
-
-    Object.keys(status).forEach(n=>{
-        if(!n || n==="innerText") return;
-        if(!status[n]) return;
-
+    Object.keys(active).forEach(k=>{
+        let a=active[k];
         breakBox.innerHTML+=`
         <div class="row">
-            <div>${pos(n)}</div>
-            <div>${n}</div>
-            <div>${f(Date.now()-status[n])}</div>
+            <div>${a.pos}</div>
+            <div>${a.name}</div>
+            <div>${a.type}</div>
+            <div>${f(Date.now()-a.start)}</div>
         </div>`;
     });
 }
 
-/* ===== TOTAL SAFE ===== */
+/* TOTAL */
 function renderTotal(){
     totalBox.innerHTML="";
-
-    Object.keys(total).forEach(n=>{
-        if(!n || n==="innerText") return;
-
-        let t = total[n]*1000;
-
-        if(!isFinite(t)) return;
-
+    Object.keys(total).forEach(k=>{
+        let a = active[k] || {name:k.split("||")[0], pos:"-"};
         totalBox.innerHTML+=`
         <div class="row">
-            <div>${pos(n)}</div>
-            <div>${n}</div>
-            <div>${f(t)}</div>
+            <div>${a.pos}</div>
+            <div>${a.name}</div>
+            <div>${f(total[k]*1000)}</div>
         </div>`;
     });
 }
