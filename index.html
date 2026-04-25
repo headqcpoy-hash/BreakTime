@@ -5,43 +5,89 @@
 <title>Break Dashboard</title>
 
 <style>
-body{
+:root {
+    --bg:
+        radial-gradient(circle at 20% 20%, rgba(140,0,255,0.25), transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0,180,255,0.25), transparent 40%),
+        linear-gradient(135deg, #070014 0%, #0b0033 40%, #050018 100%);
+    --text:#e8e6ff;
+    --box: linear-gradient(145deg, rgba(30,0,60,0.8), rgba(10,0,30,0.9));
+    --card: linear-gradient(145deg, rgba(120,0,255,0.15), rgba(0,180,255,0.10));
+    --border: rgba(160,80,255,0.5);
+}
+
+body {
     margin:0;
     padding:20px;
     font-family:sans-serif;
-    background:#0b001f;
-    color:white;
+    background:var(--bg);
+    color:var(--text);
 }
 
-#clockBox{
-    font-size:50px;
+#clockBox {
+    font-size:56px;
     text-align:center;
-    margin-bottom:20px;
+    margin-bottom:10px;
 }
 
-.main{display:flex;gap:20px;}
+.main {
+    display:flex;
+    gap:20px;
+    height:calc(100vh - 100px);
+}
 
-.box{
+.left-panel { width:300px; }
+.right-panel { flex:1; }
+
+.wrapper {
+    display:flex;
+    gap:20px;
+}
+
+.box {
     flex:1;
+    min-width:450px;
     padding:15px;
-    border:1px solid #6a00ff;
-    border-radius:10px;
-    background:#12002e;
+    border-radius:14px;
+    background:var(--box);
+    border:1px solid var(--border);
 }
 
-.row,.header{
+.header, .row {
     display:flex;
     padding:8px;
 }
 
-.header{font-weight:bold;border-bottom:1px solid #6a00ff;}
+.header {
+    font-weight:bold;
+    border-bottom:1px solid var(--border);
+}
 
-.row div,.header div{flex:1;}
+.header div, .row div {
+    flex:1;
+}
 
-select,button{
+.row {
+    margin:5px 0;
+    border-radius:10px;
+    background:var(--card);
+}
+
+select, button {
     width:100%;
     padding:10px;
     margin-top:5px;
+    background:rgba(0,0,0,0.3);
+    color:white;
+    border:1px solid var(--border);
+}
+
+button:disabled {
+    opacity:0.3;
+}
+
+#status {
+    margin-top:10px;
 }
 </style>
 </head>
@@ -51,94 +97,206 @@ select,button{
 <div id="clockBox">🕒</div>
 
 <div class="main">
+    <div class="left-panel">
+        <h3>☕ CONTROL</h3>
 
-<div class="box">
-<h3>CONTROL</h3>
+        <select id="positionSelect" onchange="updateNames(); validateForm();">
+            <option value="">ตำแหน่ง</option>
+            <option>Head</option>
+            <option>QC-SA</option>
+            <option>QC-SV</option>
+            <option>QC-PR</option>
+            <option>QC-AI</option>
+            <option>QC-MKT</option>
+            <option>QC-Support</option>
+            <option>AD-BO</option>
+            <option>AD-STM</option>
+        </select>
 
-<select id="name">
-<option value="">ชื่อ</option>
-<option>จ่าบอส</option>
-<option>สปอย</option>
-<option>มด</option>
-</select>
+        <select id="nameSelect" onchange="validateForm()">
+            <option value="">ชื่อ</option>
+        </select>
 
-<select id="type">
-<option value="">ประเภท</option>
-<option>พักกินข้าว</option>
-<option>เข้าห้องน้ำ</option>
-<option>สูบบุหรี่</option>
-</select>
+        <select id="typeSelect" onchange="validateForm()">
+            <option value="">ประเภทธุระ</option>
+            <option>พักกินข้าว</option>
+            <option>เข้าห้องน้ำ</option>
+            <option>สูบบุหรี่</option>
+            <option>เอาของ(ส่วนรวม)</option>
+        </select>
 
-<button onclick="start()">START</button>
-<button onclick="end()">END</button>
+        <button id="startBtn" onclick="startBreak()" disabled>START</button>
+        <button id="endBtn" onclick="endBreak()" disabled>END</button>
 
-<div id="status"></div>
-</div>
+        <div id="status">SYSTEM READY</div>
+    </div>
 
-<div class="box">
-<h3>ACTIVE</h3>
-<div id="activeBox"></div>
-</div>
+    <div class="right-panel">
+        <div class="wrapper">
 
+            <div class="box">
+                <h3>⏳ ACTIVE BREAK</h3>
+                <div class="header">
+                    <div>POSITION</div>
+                    <div>NAME</div>
+                    <div>TYPE</div>
+                    <div>TIME</div>
+                </div>
+                <div id="breakBox"></div>
+            </div>
+
+            <div class="box">
+                <h3>🧮 TOTAL TIME</h3>
+                <div class="header">
+                    <div>POSITION</div>
+                    <div>NAME</div>
+                    <div>TYPE</div>
+                    <div>TIME</div>
+                </div>
+                <div id="totalBox"></div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script>
+const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbz6kIwojiyGxOSES0wUMnvxeLCG4zRIwe_k7qfyzj8lbKbBfHhoOJQx91yYqVjYEcDsng/exec";
 
-/* 🔥 ใส่ URL ที่ได้จาก Deploy ตรงนี้ */
-const API_URL = "https://script.google.com/macros/s/PASTE_YOUR_URL_HERE/exec";
+const data = {
+    "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
+    "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
+    "QC-SV":["มาร์ค","บอย","โปเต้","เบียร์","ยุ้ย","แบ็ค","เจน"],
+    "QC-PR":["ฟ้า","พราว","สุ","ลีโอ","มุก","อุ้ย","แอน","แม็ก"],
+    "QC-AI":["ผ่อง","หนุ่ย","โก๊ะ","อ้อม"],
+    "QC-MKT":["มด","มอส","เต้ย","ตุ๊กกี้"],
+    "QC-Support":["เบล","อุ้ม"],
+    "AD-BO":["ปั้นแป้ง","บอสน้อย","ไอซ์ซี่","กัปตัน"],
+    "AD-STM":["ต่อ","แตงกวา","เอฟ","ไอซ์2"]
+};
 
-let active={};
+let active = {};
+let total = {};
 
+/* CLOCK */
 setInterval(()=>{
-    const n=new Date();
-    clockBox.innerText=n.toLocaleTimeString();
+    const n = new Date();
+    clockBox.innerText = `🕒 ${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
 },1000);
 
-function send(data){
+/* VALIDATE */
+function validateForm(){
+    let ok = positionSelect.value && nameSelect.value && typeSelect.value;
+    startBtn.disabled = !ok;
+    endBtn.disabled = !ok;
+    status.innerText = ok ? "READY" : "SELECT DATA";
+}
+
+/* NAME */
+function updateNames(){
+    nameSelect.innerHTML = "<option value=''>ชื่อ</option>";
+    (data[positionSelect.value] || []).forEach(n=>{
+        let o = document.createElement("option");
+        o.value = n;
+        o.text = n;
+        nameSelect.appendChild(o);
+    });
+}
+
+/* KEY */
+function key(){
+    return `${nameSelect.value}||${typeSelect.value}`;
+}
+
+/* START */
+function startBreak(){
+    let k = key();
+    if(!k) return;
+
+    active[k] = {
+        name: nameSelect.value,
+        type: typeSelect.value,
+        pos: positionSelect.value,
+        start: Date.now()
+    };
+
     fetch(API_URL,{
         method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(data)
-    })
-    .then(r=>r.text())
-    .then(t=>status.innerText="OK")
-    .catch(e=>status.innerText="ERROR");
-}
-
-function start(){
-    let name=name.value;
-    let type=type.value;
-    if(!name||!type) return;
-
-    active[name]=Date.now();
-
-    send({
-        name,
-        type,
-        position:"-",
-        action:"START",
-        duration:0
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+            name:nameSelect.value,
+            position:positionSelect.value,
+            type:typeSelect.value,
+            action:"START",
+            duration:0
+        })
     });
 }
 
-function end(){
-    let name=name.value;
-    if(!active[name]) return;
+/* END */
+function endBreak(){
+    let k = key();
+    if(!active[k]) return;
 
-    let sec=(Date.now()-active[name])/1000;
+    let sec = (Date.now() - active[k].start) / 1000;
+    total[k] = (total[k] || 0) + sec;
 
-    send({
-        name,
-        type,
-        position:"-",
-        action:"END",
-        duration:sec
+    fetch(API_URL,{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+            name:active[k].name,
+            position:active[k].pos,
+            type:active[k].type,
+            action:"END",
+            duration:sec
+        })
     });
 
-    delete active[name];
+    delete active[k];
 }
+
+/* RENDER ACTIVE */
+function render(){
+    breakBox.innerHTML = "";
+    Object.keys(active).forEach(k=>{
+        let a = active[k];
+        breakBox.innerHTML += `
+        <div class="row">
+            <div>${a.pos}</div>
+            <div>${a.name}</div>
+            <div>${a.type}</div>
+            <div>${Math.floor((Date.now()-a.start)/60000)}:${Math.floor(((Date.now()-a.start)/1000)%60).toString().padStart(2,'0')}</div>
+        </div>`;
+    });
+}
+
+/* RENDER TOTAL */
+function renderTotal(){
+    totalBox.innerHTML = "";
+    Object.keys(total).forEach(k=>{
+        let [name,type] = k.split("||");
+        let pos = "-";
+
+        for(let p in data){
+            if(data[p].includes(name)) pos = p;
+        }
+
+        totalBox.innerHTML += `
+        <div class="row">
+            <div>${pos}</div>
+            <div>${name}</div>
+            <div>${type}</div>
+            <div>${Math.floor(total[k]/60)}:${Math.floor(total[k]%60).toString().padStart(2,'0')}</div>
+        </div>`;
+    });
+}
+
+setInterval(()=>{
+    render();
+    renderTotal();
+},1000);
 
 </script>
-
 </body>
 </html>
