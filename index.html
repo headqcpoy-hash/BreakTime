@@ -161,7 +161,44 @@ button:disabled {
 </div>
 
 <script>
-const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbwN0Vls6IaLeCOaOpj2FDnETr2xK9HU-ykNYCzHmWR1rrPj8mMcD94kn9--J21qnwNemw/exec";
+async function fetchLive(){
+    try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        breakBox.innerHTML = "";
+        totalBox.innerHTML = "";
+
+        data.slice(1).forEach(row => {
+            let [time, name, pos, type, action, duration] = row;
+
+            if(action === "START"){
+                breakBox.innerHTML += `
+                <div class="row">
+                    <div>${pos}</div>
+                    <div>${name}</div>
+                    <div>${type}</div>
+                    <div>LIVE</div>
+                </div>`;
+            }
+
+            if(action === "END"){
+                totalBox.innerHTML += `
+                <div class="row">
+                    <div>${pos}</div>
+                    <div>${name}</div>
+                    <div>${type}</div>
+                    <div>${Math.floor(duration/60)}:${Math.floor(duration%60).toString().padStart(2,'0')}</div>
+                </div>`;
+            }
+        });
+
+    } catch(err){
+        console.log("SYNC ERROR:", err);
+    }
+}
+    
+const API_URL = "https://script.google.com/a/macros/log-horizon2.com/s/AKfycbxrhUSmBHE-tb-q1hxb4aqEvgmND1Re9BtBXOLtwucfUI-sfLDvQ4nasETWQ_dqIpy51g/exec";
 
 const data = {
     "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
@@ -295,16 +332,7 @@ function renderTotal(){
     });
 }
 
-setInterval(()=>{
-    render();
-    renderTotal();
-},1000);
-function test() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("LOG");
-
-  sheet.appendRow(["TEST", "OK", "OK", "OK", "OK", "0"]);
-}
+setInterval(fetchLive, 2000); // ทุก 2 วินาที
 </script>
 </body>
 </html>
