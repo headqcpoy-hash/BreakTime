@@ -6,221 +6,76 @@
 
 <style>
 
-/* =========================
-   🌟 LIGHT MODE (REAL GOLD DEPTH)
-========================= */
-:root {
-    --bg:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(255,215,120,0.3), transparent 40%),
-        linear-gradient(135deg, #fff8dc 0%, #f5d27a 50%, #e0b84f 100%);
-
-    --text:#3b2f00;
-
-    --box: linear-gradient(145deg, #ffffff, #f3e2b0);
-    --card: linear-gradient(145deg, #fff8d6, #ffd86b);
-
-    --border:#d4af37;
-}
-
-/* =========================
-   🌑 DARK MODE (DEPTH REAL)
-========================= */
-body.dark {
-    --bg:
-        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.05), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 40%),
-        linear-gradient(135deg, #000000 0%, #0a0a0a 40%, #1a1a1a 100%);
-
-    --text:#ffffff;
-
-    --box: linear-gradient(145deg, #0a0a0a, #1a1a1a);
-    --card: linear-gradient(145deg, #121212, #1f1f1f);
-
-    --border:#2a2a2a;
-}
-
-/* =========================
-   BASE
-========================= */
+/* ===== FULLSCREEN ===== */
 body {
     margin:0;
-    padding:15px;
+    padding:20px;
     font-family:sans-serif;
-    background:var(--bg);
-    color:var(--text);
+    min-height:100vh;
 }
 
-/* =========================
-   TOP BAR
-========================= */
-#topBar {
-    position:relative;
+/* ===== LAYOUT ===== */
+.main {
     display:flex;
-    justify-content:center;
-    margin-bottom:10px;
+    gap:20px;
+    height:calc(100vh - 100px);
 }
-
-#clockBox {
-    font-size:40px;
-    font-weight:bold;
-    padding:10px 20px;
-    border-radius:14px;
-    text-align:center;
-
-    background:linear-gradient(145deg,#ffffff,#ffe9a3);
-    border:2px solid #d4af37;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.6),
-        0 6px 20px rgba(212,175,55,0.3);
-}
-
-body.dark #clockBox {
-    background:linear-gradient(145deg,#0a0a0a,#1a1a1a);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        0 8px 25px rgba(0,0,0,0.9);
-}
-
-/* =========================
-   THEME BTN
-========================= */
-#themeBtn {
-    position:absolute;
-    right:10px;
-    top:10px;
-    width:30px;
-    height:30px;
-    border-radius:6px;
-    border:1px solid var(--border);
-    cursor:pointer;
-}
-
-/* =========================
-   LAYOUT
-========================= */
-.main { display:flex; gap:15px; }
 
 .left-panel {
-    width:230px;
+    width:300px;
+    font-size:16px;
 }
 
 .right-panel { flex:1; }
 
-.wrapper { display:flex; gap:15px; flex-wrap:wrap; }
-
-/* =========================
-   BOX (REAL DEPTH)
-========================= */
-.box, .left-panel {
-    padding:10px;
-    border-radius:14px;
-    background:var(--box);
-    border:1px solid var(--border);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.4),
-        inset 0 -2px 4px rgba(0,0,0,0.2),
-        0 8px 25px rgba(0,0,0,0.2);
-
-    transition:0.25s;
-}
-
-body.dark .box,
-body.dark .left-panel {
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        inset 0 -3px 6px rgba(0,0,0,0.8),
-        0 10px 30px rgba(0,0,0,0.9);
-}
-
-.box:hover {
-    transform:translateY(-3px);
-}
-
-/* =========================
-   HEADER
-========================= */
-.table-header {
+.wrapper {
     display:flex;
-    font-weight:bold;
-    font-size:12px;
-    padding:6px 8px;
-    margin-bottom:6px;
-
-    border-bottom:2px solid transparent;
-
-    background:
-        linear-gradient(var(--box), var(--box)) padding-box,
-        linear-gradient(90deg, #d4af37, #fff2a6, #d4af37) border-box;
+    gap:20px;
+    flex-wrap:wrap;
 }
 
-.table-header div { flex:1; }
-.table-header div:last-child { text-align:right; }
-
-/* =========================
-   CARD
-========================= */
-.card.row {
-    display:flex;
-    padding:8px;
-    margin:5px;
-    border-radius:10px;
-    background:var(--card);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.3),
-        0 4px 10px rgba(0,0,0,0.15);
-
-    transition:0.2s;
+/* ===== BOX ===== */
+.box {
+    flex:1;
+    min-width:450px;
+    padding:15px;
+    border-radius:12px;
+    background:#f5f5f5;
 }
 
-body.dark .card.row {
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        0 6px 18px rgba(0,0,0,0.8);
+/* ===== CLOCK ===== */
+#clockBox {
+    font-size:56px;
+    text-align:center;
+    margin-bottom:10px;
 }
 
-.card.row:hover {
-    transform:translateY(-2px);
-}
-
-/* =========================
-   TEXT
-========================= */
-.col { flex:1; font-size:13px; }
-
-.col.pos {
-    font-weight:bold;
-    color:#b8860b;
-}
-
-body.dark .col.pos {
-    color:#f5d06f;
-}
-
-.col.name { font-weight:bold; }
-
-.col.time {
-    text-align:right;
-    font-family:monospace;
-}
-
-/* =========================
-   FORM
-========================= */
+/* ===== FORM ===== */
 select, button {
     width:100%;
+    padding:10px;
+    font-size:16px;
     margin-top:5px;
-    padding:5px;
-    font-size:14px;
+}
+
+button:disabled {
+    opacity:0.4;
+    cursor:not-allowed;
 }
 
 #status {
     margin-top:10px;
-    color:#b8860b;
+    font-weight:bold;
+}
+
+/* ===== ROW ===== */
+.row {
+    display:flex;
+    justify-content:space-between;
+    padding:6px;
+    margin:4px 0;
+    background:#fff;
+    border-radius:6px;
 }
 
 </style>
@@ -228,17 +83,16 @@ select, button {
 
 <body>
 
-<div id="topBar">
-    <div id="clockBox">🕒</div>
-    <button id="themeBtn" onclick="toggleTheme()">🌙</button>
-</div>
+<div id="clockBox">🕒</div>
 
 <div class="main">
 
+<!-- LEFT -->
 <div class="left-panel">
-<h4>☕ ลงเวลา</h4>
 
-<select id="positionSelect" onchange="updateNames()">
+<h3>☕ ลงเวลา</h3>
+
+<select id="positionSelect" onchange="updateNames(); validateForm();">
 <option value="">ตำแหน่ง</option>
 <option>Head</option>
 <option>QC-SA</option>
@@ -251,46 +105,39 @@ select, button {
 <option>AD-STM</option>
 </select>
 
-<select id="nameSelect">
-<option>ชื่อ</option>
+<select id="nameSelect" onchange="validateForm()">
+<option value="">ชื่อ</option>
 </select>
 
-<button onclick="startBreak()">พัก ☕</button>
-<button onclick="endBreak()">กลับ 💻</button>
+<button id="startBtn" onclick="startBreak()" disabled>พัก ☕</button>
+<button id="endBtn" onclick="endBreak()" disabled>กลับ 💻</button>
 
-<div id="status">-</div>
+<div id="status">กรุณาเลือกข้อมูล</div>
+
 </div>
 
+<!-- RIGHT -->
 <div class="right-panel">
 <div class="wrapper">
 
 <div class="box">
 <h3>⏳ กำลังพัก</h3>
-<div class="table-header">
-<div>ตำแหน่ง</div>
-<div>ชื่อ</div>
-<div>ระยะเวลา</div>
-</div>
 <div id="breakBox"></div>
 </div>
 
 <div class="box">
 <h3>🧮 เวลาสะสม</h3>
-<div class="table-header">
-<div>ตำแหน่ง</div>
-<div>ชื่อ</div>
-<div>ระยะเวลา</div>
-</div>
 <div id="totalBox"></div>
 </div>
 
 </div>
 </div>
+
 </div>
 
 <script>
 
-/* DATA */
+/* ===== DATA เต็ม ===== */
 const data = {
 "Head":["จ่าบอส","สปอย","มด ตานอย","ป็อป","เบส","โจโจ้","บอย ท่าพระจันทร์","อร","มอน"],
 "QC-SA":["นิด","แนท","แม็ก2","ปู","หนิง","เอ","ใจ๋","ป็อบ","เฟน","เกมส์","ดาว","มะลิ","ปลา","มิน","แอ๊ว","มุ้ย"],
@@ -306,30 +153,40 @@ const data = {
 let status = {};
 let total = {};
 
+/* ===== CLOCK ===== */
 function clock(){
     const n=new Date();
-    const d=String(n.getDate()).padStart(2,'0');
-    const m=String(n.getMonth()+1).padStart(2,'0');
-    const y=n.getFullYear();
     const hh=String(n.getHours()).padStart(2,'0');
     const mm=String(n.getMinutes()).padStart(2,'0');
     const ss=String(n.getSeconds()).padStart(2,'0');
-    const day=["อา","จ","อ","พ","พฤ","ศ","ส"];
 
     document.getElementById("clockBox").innerHTML =
-    `🕒 ${hh}:${mm}:${ss}<br>📅 ${d}/${m}/${y} (${day[n.getDay()]})`;
+    `🕒 ${hh}:${mm}:${ss}`;
 }
 setInterval(clock,1000);
 clock();
 
-function toggleTheme(){
-    document.body.classList.toggle("dark");
+/* ===== VALIDATE ===== */
+function validateForm(){
+    let pos = document.getElementById("positionSelect").value;
+    let name = document.getElementById("nameSelect").value;
+
+    let enable = pos && name;
+
+    document.getElementById("startBtn").disabled = !enable;
+    document.getElementById("endBtn").disabled = !enable;
+
+    document.getElementById("status").innerText =
+        enable ? "พร้อมใช้งาน" : "กรุณาเลือกตำแหน่ง + ชื่อ";
 }
 
+/* ===== UPDATE NAME ===== */
 function updateNames(){
     let p=document.getElementById("positionSelect").value;
     let s=document.getElementById("nameSelect");
-    s.innerHTML="<option>ชื่อ</option>";
+
+    s.innerHTML="<option value=''>ชื่อ</option>";
+
     (data[p]||[]).forEach(n=>{
         let o=document.createElement("option");
         o.text=n;
@@ -338,15 +195,18 @@ function updateNames(){
     });
 }
 
+/* ===== START ===== */
 function startBreak(){
     let n=document.getElementById("nameSelect").value;
-    if(!n) return alert("เลือกชื่อ");
+    if(!n) return;
     status[n]=Date.now();
 }
 
+/* ===== END ===== */
 function endBreak(){
     let n=document.getElementById("nameSelect").value;
     if(!n) return;
+
     if(status[n]){
         let sec=(Date.now()-status[n])/1000;
         total[n]=(total[n]||0)+sec;
@@ -354,6 +214,7 @@ function endBreak(){
     }
 }
 
+/* ===== FORMAT ===== */
 function f(ms){
     let s=Math.floor(ms/1000);
     let m=String(Math.floor(s/60)).padStart(2,'0');
@@ -361,6 +222,7 @@ function f(ms){
     return `${m}:${r}`;
 }
 
+/* ===== POSITION ===== */
 function pos(n){
     for(let p in data){
         if(data[p].includes(n)) return p;
@@ -368,15 +230,16 @@ function pos(n){
     return "-";
 }
 
+/* ===== RENDER ===== */
 function render(){
     let b=document.getElementById("breakBox");
     b.innerHTML="";
     Object.keys(status).forEach(n=>{
-        b.innerHTML+=`
-        <div class="card row">
-            <div class="col pos">${pos(n)}</div>
-            <div class="col name">${n}</div>
-            <div class="col time">${f(Date.now()-status[n])}</div>
+        b.innerHTML+= `
+        <div class="row">
+            <span>${pos(n)}</span>
+            <span>${n}</span>
+            <span>${f(Date.now()-status[n])}</span>
         </div>`;
     });
 }
@@ -385,11 +248,11 @@ function renderTotal(){
     let b=document.getElementById("totalBox");
     b.innerHTML="";
     Object.keys(total).forEach(n=>{
-        b.innerHTML+=`
-        <div class="card row">
-            <div class="col pos">${pos(n)}</div>
-            <div class="col name">${n}</div>
-            <div class="col time">${f(total[n]*1000)}</div>
+        b.innerHTML+= `
+        <div class="row">
+            <span>${pos(n)}</span>
+            <span>${n}</span>
+            <span>${f(total[n]*1000)}</span>
         </div>`;
     });
 }
