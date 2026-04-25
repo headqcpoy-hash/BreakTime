@@ -296,7 +296,12 @@ setInterval(()=>{
     render();
     renderTotal();
 },1000);
+function test() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("LOG");
 
+  sheet.appendRow(["TEST", "OK", "OK", "OK", "OK", "0"]);
+}
 </script>
 </body>
 </html>
